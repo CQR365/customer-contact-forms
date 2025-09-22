@@ -664,7 +664,7 @@
         </div>
         
         <!-- Form with Formspree integration -->
-        <form id="masterIncidentForm" action="https://formspree.io/f/xldprzkr" method="POST" enctype="multipart/form-data" style="display: contents;">
+        <form id="masterIncidentForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" enctype="multipart/form-data" style="display: contents;">
             <!-- Hidden fields for Formspree -->
             <input type="hidden" name="_subject" value="New CQR365 Incident Report">
             <input type="hidden" name="incident_reference" id="hiddenIncidentRef">
@@ -1462,64 +1462,88 @@
         }
         
         function submitToFormspree() {
-    const form = document.getElementById('masterIncidentForm');
-    const submitBtn = document.getElementById('finalSubmitBtn');
-    
-    // Show loading state
-    submitBtn.classList.add('loading');
-    submitBtn.disabled = true;
-    
-    // Create simplified form data
-    const formData = new FormData();
-    
-    // Add basic incident data
-    formData.append('incident_reference', incidentReferenceNumber);
-    formData.append('incident_date', document.getElementById('incidentDate').value);
-    formData.append('incident_time', document.getElementById('incidentTime').value);
-    formData.append('reported_by', document.getElementById('reportedBy').value);
-    formData.append('reporter_role', document.getElementById('reporterRole').value);
-    formData.append('incident_location', document.getElementById('incidentLocation').value);
-    formData.append('incident_type', document.getElementById('incidentType').value);
-    formData.append('incident_description', document.getElementById('incidentDescription').value);
-    
-    // Add severity
-    const severity = document.querySelector('input[name="incident_severity"]:checked');
-    if (severity) {
-        formData.append('incident_severity', severity.value);
-    }
-    
-    // Add witness count (not full data)
-    formData.append('witness_statements_count', witnesses.length);
-    
-    // Add investigation data if present
-    const investigator = document.getElementById('investigator').value;
-    if (investigator) {
-        formData.append('lead_investigator', investigator);
-        formData.append('root_cause_analysis', document.getElementById('rootCause').value);
-        formData.append('corrective_actions', document.getElementById('correctiveActions').value);
-    }
-    
-    // Submit to Formspree
-    fetch('https://formspree.io/f/YOUR_FORM_ID', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (response.ok) {
-            showSuccessMessage();
-        } else {
-            throw new Error(`HTTP ${response.status}`);
+            const submitBtn = document.getElementById('finalSubmitBtn');
+            
+            // Show loading state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            
+            // Create simplified form data that Formspree can handle
+            const formData = new FormData();
+            
+            // Basic incident information
+            formData.append('_subject', 'New CQR365 Incident Report');
+            formData.append('incident_reference', incidentReferenceNumber);
+            formData.append('incident_date', document.getElementById('incidentDate').value);
+            formData.append('incident_time', document.getElementById('incidentTime').value);
+            formData.append('reported_by', document.getElementById('reportedBy').value);
+            formData.append('reporter_role', document.getElementById('reporterRole').value);
+            formData.append('incident_location', document.getElementById('incidentLocation').value);
+            formData.append('incident_type', document.getElementById('incidentType').value);
+            formData.append('incident_description', document.getElementById('incidentDescription').value);
+            formData.append('immediate_actions', document.getElementById('immediateActions').value);
+            formData.append('witnesses_info', document.getElementById('witnesses').value);
+            
+            // Severity level
+            const severity = document.querySelector('input[name="incident_severity"]:checked');
+            if (severity) {
+                formData.append('incident_severity', severity.value);
+            }
+            
+            // People involved (simplified)
+            const peopleInvolved = [];
+            document.querySelectorAll('input[name="people_involved"]:checked').forEach(checkbox => {
+                peopleInvolved.push(checkbox.value);
+            });
+            formData.append('people_involved', peopleInvolved.join(', '));
+            
+            // Authorities and follow-up
+            formData.append('authorities_notified', document.getElementById('notifiedAuthorities').value);
+            formData.append('followup_required', document.getElementById('followUpRequired').value);
+            
+            // Investigation data (if completed)
+            const investigator = document.getElementById('investigator').value;
+            if (investigator) {
+                formData.append('lead_investigator', investigator);
+                formData.append('investigation_date', document.getElementById('investigationDate').value);
+                formData.append('root_cause_analysis', document.getElementById('rootCause').value);
+                formData.append('corrective_actions', document.getElementById('correctiveActions').value);
+                formData.append('preventive_actions', document.getElementById('preventiveActions').value);
+                formData.append('action_owner', document.getElementById('actionOwner').value);
+                formData.append('target_completion_date', document.getElementById('targetDate').value);
+                formData.append('priority_level', document.getElementById('priority').value);
+            }
+            
+            // Witness statements summary (not full JSON)
+            formData.append('witness_statements_count', witnesses.length);
+            if (witnesses.length > 0) {
+                const witnessNames = witnesses.map(w => w.name).join(', ');
+                formData.append('witness_names', witnessNames);
+            }
+            
+            // Submit to Formspree with your specific form ID
+            fetch('https://formspree.io/f/xldprzkr', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    showSuccessMessage();
+                } else {
+                    return response.text().then(text => {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Submission error:', error);
+                alert(`Submission failed: ${error.message}\n\nPlease check your internet connection and try again.`);
+            })
+            .finally(() => {
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+            });
         }
-    })
-    .catch(error => {
-        console.error('Submission error:', error);
-        alert(`Submission failed: ${error.message}`);
-    })
-    .finally(() => {
-        submitBtn.classList.remove('loading');
-        submitBtn.disabled = false;
-    });
-}
         
         function showSuccessMessage() {
             document.getElementById('submissionForm').style.display = 'none';
