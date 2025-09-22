@@ -1568,8 +1568,9 @@
 
         // Form submission handler
         document.getElementById('cqrForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Thank you! Your CQR365 initial interest form has been submitted successfully. Our team will contact you within 2 business days to discuss your requirements.');
+    	// Don't prevent default - let the form submit to Formspree
+    	alert('Thank you! Your CQR365 initial interest form has been submitted successfully. Our team will contact you within 2 business days to discuss your requirements.');
+});
             
             // Uncomment the line below to actually submit to Formspree
             this.submit();
