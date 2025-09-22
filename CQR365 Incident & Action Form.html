@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CQR365 Incident Reporting System</title>
+    <!-- Keep your existing CSS styles here - they're excellent -->
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Your existing HTML structure with these key modifications: -->
+    
+    <!-- Wrap everything in a single form for Formspree submission -->
+    <form id="masterIncidentForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" enctype="multipart/form-data">
+        
+        <!-- Hidden fields to track form state -->
+        <input type="hidden" name="_subject" value="New Incident Report">
+        <input type="hidden" name="incident_reference" id="hiddenIncidentRef">
+        <input type="hidden" name="form_sections_completed" id="hiddenSectionsCompleted">
+        <input type="hidden" name="witness_statements_json" id="hiddenWitnessData">
+        
+        <!-- Your existing container and header -->
+        <div class="container">
+            <div class="header">
+                <h1>CQR365 Incident Reporting System</h1>
+                <p>Professional incident management and reporting platform</p>
+                <div class="incident-ref" id="incidentRef">
+                    <span>Incident Reference: <span id="refNumber">INC-20250830-1633-4524</span></span>
+                </div>
+                <div class="status-indicator active">
+                    <span>System Active</span>
+                </div>
+            </div>
+            
+            <!-- Main Incident Form Section -->
+            <div class="form-container" id="incidentForm">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                
+                <div class="step active">
+                    <div class="step-header">
+                        <h2>Incident Report</h2>
+                        <p>Provide comprehensive details about the incident for proper documentation and follow-up</p>
+                    </div>
+                    
+                    <!-- Add name attributes for Formspree -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="incidentDate">Date of Incident <span class="required">*</span></label>
+                            <input type="date" id="incidentDate" name="incident_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="incidentTime">Time of Incident <span class="required">*</span></label>
+                            <input type="time" id="incidentTime" name="incident_time" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reportedBy">Reported By <span class="required">*</span></label>
+                            <input type="text" id="reportedBy" name="reported_by" placeholder="Full name of reporter" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reporterRole">Reporter Role <span class="required">*</span></label>
+                            <select id="reporterRole" name="reporter_role" required>
+                                <option value="">Select your role...</option>
+                                <option value="manager">Manager</option>
+                                <option value="supervisor">Supervisor</option>
+                                <!-- Keep all your existing options -->
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Continue adding name attributes to all form fields -->
+                    <div class="form-group">
+                        <label for="incidentLocation">Location of Incident <span class="required">*</span></label>
+                        <select id="incidentLocation" name="incident_location" required>
+                            <!-- Your existing options -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="incidentType">Type of Incident <span class="required">*</span></label>
+                        <select id="incidentType" name="incident_type" required>
+                            <!-- Your existing options -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Incident Severity <span class="required">*</span></label>
+                        <div class="severity-grid">
+                            <div class="severity-card">
+                                <input type="radio" name="incident_severity" value="low" id="severity-low" required>
+                                <div class="severity-title">Low</div>
+                                <div class="severity-desc">Minor incident, no injury, minimal business impact</div>
+                            </div>
+                            <!-- Keep your existing severity options -->
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="incidentDescription">Detailed Description <span class="required">*</span></label>
+                        <textarea id="incidentDescription" name="incident_description" rows="4" placeholder="Provide a comprehensive description..." required></textarea>
+                    </div>
+                    
+                    <!-- File upload for Formspree -->
+                    <div class="form-group">
+                        <label>Evidence & Documentation</label>
+                        <input type="file" name="evidence_files" id="fileUpload" multiple accept="image/*,.pdf,.doc,.docx">
+                        <div class="file-upload-desc">Photos, documents, reports (Max 10MB per file)</div>
+                    </div>
+                    
+                    <!-- Navigation buttons -->
+                    <div class="navigation">
+                        <button type="button" class="btn btn-primary" onclick="proceedToInvestigation()">
+                            Continue to Investigation
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="openWitnessForm()">
+                            Add Witness Statement
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Investigation Form Section (hidden initially) -->
+            <div class="form-container" id="investigationForm" style="display: none;">
+                <!-- Add name attributes to all investigation fields -->
+                <div class="form-group">
+                    <label for="investigator">Lead Investigator <span class="required">*</span></label>
+                    <input type="text" id="investigator" name="lead_investigator" placeholder="Name and title of investigating officer">
+                </div>
+                
+                <div class="form-group">
+                    <label for="rootCause">Root Cause Analysis <span class="required">*</span></label>
+                    <textarea id="rootCause" name="root_cause_analysis" rows="4" placeholder="Identify and analyze the underlying root cause(s)..."></textarea>
+                </div>
+                
+                <!-- Continue with all investigation fields... -->
+                
+                <div class="navigation">
+                    <button type="button" class="btn btn-secondary" onclick="backToIncidentForm()">
+                        Back to Incident Report
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="proceedToSubmission()">
+                        Review & Submit
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Final Submission Section -->
+            <div class="form-container" id="submissionForm" style="display: none;">
+                <div class="step-header">
+                    <h2>Review & Submit</h2>
+                    <p>Review your incident report before final submission</p>
+                </div>
+                
+                <!-- Summary of all collected data -->
+                <div id="reportSummary"></div>
+                
+                <div class="navigation">
+                    <button type="button" class="btn btn-secondary" onclick="backToInvestigation()">
+                        Back to Edit
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="finalSubmitBtn">
+                        Submit Complete Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+    
+    <script>
+        // Modified JavaScript for Formspree integration
+        let witnesses = [];
+        let incidentReferenceNumber = '';
+        
+        // Initialize form
+        document.addEventListener('DOMContentLoaded', function() {
+            incidentReferenceNumber = generateIncidentReference();
+            document.getElementById('refNumber').textContent = incidentReferenceNumber;
+            document.getElementById('hiddenIncidentRef').value = incidentReferenceNumber;
+            
+            // Set current date/time
+            const now = new Date();
+            document.getElementById('incidentDate').value = now.toISOString().split('T')[0];
+            document.getElementById('incidentTime').value = now.toTimeString().slice(0, 5);
+        });
+        
+        // Form submission handler
+        document.getElementById('masterIncidentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Prepare data for submission
+            prepareFormData();
+            
+            // Submit to Formspree
+            submitToFormspree();
+        });
+        
+        function prepareFormData() {
+            // Update hidden fields with current state
+            document.getElementById('hiddenSectionsCompleted').value = getCurrentSections();
+            document.getElementById('hiddenWitnessData').value = JSON.stringify(witnesses);
+        }
+        
+        function submitToFormspree() {
+            const form = document.getElementById('masterIncidentForm');
+            const formData = new FormData(form);
+            
+            // Show loading state
+            document.getElementById('finalSubmitBtn').classList.add('loading');
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    showSuccessMessage();
+                } else {
+                    throw new Error('Submission failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('There was an error submitting your report. Please try again.');
+            })
+            .finally(() => {
+                document.getElementById('finalSubmitBtn').classList.remove('loading');
+            });
+        }
+        
+        function showSuccessMessage() {
+            // Hide forms and show success
+            document.getElementById('submissionForm').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+        }
+        
+        // Your existing helper functions
+        function generateIncidentReference() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const random = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
+            
+            return `INC-${year}${month}${day}-${hours}${minutes}-${random}`;
+        }
+        
+        // Navigation functions
+        function proceedToInvestigation() {
+            if (validateIncidentForm()) {
+                document.getElementById('incidentForm').style.display = 'none';
+                document.getElementById('investigationForm').style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+        
+        function proceedToSubmission() {
+            if (validateInvestigationForm()) {
+                generateReportSummary();
+                document.getElementById('investigationForm').style.display = 'none';
+                document.getElementById('submissionForm').style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+        
+        // Add your existing validation and helper functions...
+    </script>
+</body>
+</html>
