@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CQR365 - Advanced Property Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-orange: #CC5500;
+            --dark-orange: #B8460C;
+            --light-orange: #E6672E;
+            --black: #000000;
+            --white: #FFFFFF;
+            --light-gray: #F8F9FA;
+            --medium-gray: #6C757D;
+            --dark-gray: #343A40;
+            --border-color: #DEE2E6;
+            --success: #28A745;
+            --warning: #FFC107;
+            --danger: #DC3545;
+            --shadow-light: 0 2px 10px rgba(0,0,0,0.1);
+            --shadow-medium: 0 4px 20px rgba(0,0,0,0.15);
+            --shadow-heavy: 0 8px 40px rgba(0,0,0,0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--light-gray) 0%, #E8ECEF 100%);
+            color: var(--dark-gray);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, var(--black) 0%, var(--dark-gray) 100%);
+            color: var(--white);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: var(--shadow-heavy);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--primary-orange);
+            background: var(--black);
+        }
+
+        .sidebar-header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-orange);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-header p {
+            font-size: 0.9rem;
+            color: var(--medium-gray);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-nav {
+            padding: 20px 15px;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            color: var(--medium-gray);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            padding: 0 15px;
+        }
+
+        .nav-btn, .custom-nav-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #B8C5D6;
+            padding: 15px 20px;
+            margin-bottom: 5px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+        }
+
+        .nav-btn:before, .custom-nav-btn:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-orange);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-btn:hover, .custom-nav-btn:hover {
+            background: rgba(204, 85, 0, 0.1);
+            color: var(--white);
+            transform: translateX(5px);
+        }
+
+        .nav-btn:hover:before, .custom-nav-btn:hover:before {
+            transform: scaleY(1);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--dark-orange) 100%);
+            color: var(--white);
+            font-weight: 600;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .nav-btn.active:before {
+            transform: scaleY(1);
+        }
+
+        .custom-nav-btn .external-icon {
+            margin-left: auto;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .nav-icon {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Custom Links Management */
+        .custom-links-section {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .add-link-btn {
+            width: 100%;
+            background: rgba(204, 85, 0, 0.2);
+            border: 2px dashed var(--primary-orange);
+            color: var(--primary-orange);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .add-link-btn:hover {
+            background: rgba(204, 85, 0, 0.3);
+            border-style: solid;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 30px;
+            background: var(--light-gray);
+            min-height: 100vh;
+        }
+
+        .content-section {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid var(--border-color);
+            display: none;
+            min-height: calc(100vh - 100px);
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section-title {
+            color: var(--black);
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .section-subtitle {
+            color: var(--medium-gray);
+            font-size: 1rem;
+            margin-top: 5px;
+            font-weight: 400;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-orange);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: var(--shadow-light);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover {
+            background: var(--dark-orange);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn:hover:before {
+            left: 100%;
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--dark-gray);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-gray);
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: #C82333;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+        }
+
+        .btn-icon {
+            margin-right: 8px;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .dashboard-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-orange), var(--dark-orange));
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .card-header h3 {
+            color: var(--medium-gray);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        .card-value {
+            color: var(--black);
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1;
+            margin: 10px 0;
+        }
+
+        .card-trend {
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .card-trend.positive {
+            color: var(--success);
+            background: rgba(40, 167, 69, 0.1);
+        }
+
+        .card-trend.negative {
+            color: var(--danger);
+            background: rgba(220, 53, 69, 0.1);
+        }
+
+        .card-trend.pending {
+            color: var(--warning);
+            background: rgba(255, 193, 7, 0.1);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-heavy);
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .modal-title {
+            color: var(--black);
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: var(--light-gray);
+            border: none;
+            color: var(--medium-gray);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: var(--primary-orange);
+            color: var(--white);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark-gray);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--white);
+            color: var(--dark-gray);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px rgba(204, 85, 0, 0.1);
+        }
+
+        /* Mobile Navigation */
+        .mobile-nav-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2001;
+            background: var(--black);
+            color: var(--primary-orange);
+            border: 2px solid var(--primary-orange);
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .mobile-overlay.active {
+            display: block;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .mobile-nav-toggle {
+                display: block;
+            }
+
+            .content-section {
+                padding: 20px;
+                border-radius: 10px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                margin-bottom: 30px;
+            }
+
+            .modal-content {
+                margin: 10px;
+                width: calc(100% - 20px);
+                padding: 25px;
+                max-height: 85vh;
+            }
+        }
+
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Navigation Toggle -->
+    <button class="mobile-nav-toggle" onclick="toggleMobileNav()">☰</button>
+    
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" onclick="closeMobileNav()"></div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>CQR 365</h1>
+                <p>Property Management System</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Core Modules</div>
+                    <button class="nav-btn active" onclick="showSection('property-passports')">
+                        Property Passports
+                    </button>
+                    <button class="nav-btn" onclick="showSection('incidents-actions')">
+                        Incidents & Actions
+                    </button>
+                    <button class="nav-btn" onclick="showSection('hot-tubs')">
+                        Hot Tubs
+                    </button>
+                    <button class="nav-btn" onclick="showSection('accommodation')">
+                        Accommodation
+                    </button>
+                    <button class="nav-btn" onclick="showSection('grounds-maintenance')">
+                        Grounds & Maintenance
+                    </button>
+                    <button class="nav-btn" onclick="showSection('food-beverage')">
+                        Food & Beverage
+                    </button>
+                    <button class="nav-btn" onclick="showSection('vehicles')">
+                        Vehicles
+                    </button>
+                    <button class="nav-btn" onclick="showSection('library')">
+                        Library
+                    </button>
+                    <button class="nav-btn" onclick="showSection('all-water')">
+                        All Water
+                    </button>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Management</div>
+                    <button class="nav-btn" onclick="showSection('team')">
+                        Team
+                    </button>
+                    <button class="nav-btn" onclick="showSection('risk-assessment')">
+                        Risk Assessment
+                    </button>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Analytics</div>
+                    <button class="nav-btn" onclick="showSection('dashboard')">
+                        Dashboard
+                    </button>
+                    <button class="nav-btn" onclick="showSection('reports')">
+                        Reports
+                    </button>
+                </div>
+
+                <!-- Custom Links Section -->
+                <div class="nav-section custom-links-section">
+                    <div class="nav-section-title">Custom Links</div>
+                    <button class="add-link-btn" onclick="openAddLinkModal()">
+                        + Add Custom Link
+                    </button>
+                    <div id="customLinksContainer"></div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Property Passports Section -->
+            <div id="property-passports" class="content-section fade-in active">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Property Passports</h2>
+                        <p class="section-subtitle">Comprehensive property management and documentation</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Total Properties</h3>
+                            <div class="card-value">247</div>
+                        </div>
+                        <div class="card-trend positive">+12% from last month</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Occupancy Rate</h3>
+                            <div class="card-value">94.2%</div>
+                        </div>
+                        <div class="card-trend positive">+2.1% from last month</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Total Revenue</h3>
+                            <div class="card-value">£2.4M</div>
+                        </div>
+                        <div class="card-trend positive">+8.5% from last month</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Maintenance Requests</h3>
+                            <div class="card-value">18</div>
+                        </div>
+                        <div class="card-trend negative">+3 from last week</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Incidents & Actions Section -->
+            <div id="incidents-actions" class="content-section fade-in">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Incidents & Actions</h2>
+                        <p class="section-subtitle">Incident reporting, tracking and corrective actions</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Open Incidents</h3>
+                            <div class="card-value">12</div>
+                        </div>
+                        <div class="card-trend negative">+3 this week</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Pending Actions</h3>
+                            <div class="card-value">8</div>
+                        </div>
+                        <div class="card-trend pending">Requires attention</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Avg Resolution Time</h3>
+                            <div class="card-value">2.4 days</div>
+                        </div>
+                        <div class="card-trend positive">-0.6 days vs target</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Critical Incidents</h3>
+                            <div class="card-value">2</div>
+                        </div>
+                        <div class="card-trend negative">Requires attention</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hot Tubs Section -->
+            <div id="hot-tubs" class="content-section fade-in">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Hot Tubs</h2>
+                        <p class="section-subtitle">Hot tub maintenance, water quality and safety management</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Active Hot Tubs</h3>
+                            <div class="card-value">24</div>
+                        </div>
+                        <div class="card-trend positive">All operational</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Water Quality Score</h3>
+                            <div class="card-value">96.8%</div>
+                        </div>
+                        <div class="card-trend positive">Excellent rating</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Maintenance Due</h3>
+                            <div class="card-value">3</div>
+                        </div>
+                        <div class="card-trend pending">Within 7 days</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Temperature Range</h3>
+                            <div class="card-value">38-40°C</div>
+                        </div>
+                        <div class="card-trend positive">Optimal range</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accommodation Section -->
+            <div id="accommodation" class="content-section fade-in">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Accommodation</h2>
+                        <p class="section-subtitle">Guest accommodation management and booking system</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Available Rooms</h3>
+                            <div class="card-value">47</div>
+                        </div>
+                        <div class="card-trend positive">78% occupancy</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Check-ins Today</h3>
+                            <div class="card-value">12</div>
+                        </div>
+                        <div class="card-trend positive">On schedule</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Guest Satisfaction</h3>
+                            <div class="card-value">4.7/5</div>
+                        </div>
+                        <div class="card-trend positive">+0.2 this month</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Housekeeping Queue</h3>
+                            <div class="card-value">8</div>
+                        </div>
+                        <div class="card-trend pending">Rooms pending</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grounds & Maintenance Section -->
+            <div id="grounds-maintenance" class="content-section fade-in">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Grounds & Maintenance</h2>
+                        <p class="section-subtitle">Landscaping, outdoor facilities and general maintenance</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Open Work Orders</h3>
+                            <div class="card-value">34</div>
+                        </div>
+                        <div class="card-trend negative">+7 this week</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Grounds Condition</h3>
+                            <div class="card-value">92%</div>
+                        </div>
+                        <div class="card-trend positive">Excellent condition</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Equipment Status</h3>
+                            <div class="card-value">87%</div>
+                        </div>
+                        <div class="card-trend positive">Operational</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Monthly Budget</h3>
+                            <div class="card-value">£18,450</div>
+                        </div>
+                        <div class="card-trend positive">Under budget</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Food & Beverage Section -->
+            <div id="food-beverage" class="content-section fade-in">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Food & Beverage</h2>
+                        <p class="section-subtitle">Restaurant and catering management</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Daily Revenue</h3>
+                            <div class="card-value">£14,250</div>
+                        </div>
+                        <div class="card-trend positive">+7% vs yesterday</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Food Safety Score</h3>
+                            <div class="card-value">98%</div>
+                        </div>
+                        <div class="card-trend positive">Excellent rating</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Waste Percentage</h3>
+                            <div class="card-value">3.2%</div>
+                        </div>
+                        <div class="card-trend positive">-0.8% from target</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Staff Efficiency</h3>
+                            <div class="card-value">87%</div>
+                        </div>
+                        <div class="card-trend positive">+5% this week</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vehicles Section -->
+            <div id="vehicles" class="content-section fade-in">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Vehicles</h2>
+                        <p class="section-subtitle">Fleet management and tracking</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Active Vehicles</h3>
+                            <div class="card-value">42</div>
+                        </div>
+                        <div class="card-trend positive">All operational</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Fuel Efficiency</h3>
+                            <div class="card-value">12.8 L/100km</div>
+                        </div>
+                        <div class="card-trend positive">-2.1% vs last month</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Maintenance Due</h3>
+                            <div class="card-value">7</div>
+                        </div>
+                        <div class="card-trend pending">Within 30 days</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Total Miles</h3>
+                            <div class="card-value">145,230</div>
+                        </div>
+                        <div class="card-trend positive">This month</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Library Section -->
+            <div id="library" class="content-section fade-in">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Library</h2>
+                        <p class="section-subtitle">Document management and knowledge base</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Total Documents</h3>
+                            <div class="card-value">2,847</div>
+                        </div>
+                        <div class="card-trend positive">+127 this month</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Compliance Rate</h3>
+                            <div class="card-value">96.7%</div>
+                        </div>
+                        <div class="card-trend positive">All critical docs current</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Pending Reviews</h3>
+                            <div class="card-value">23</div>
+                        </div>
+                        <div class="card-trend pending">Due this week</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Storage Used</h3>
+                            <div class="card-value">78%</div>
+                        </div>
+                        <div class="card-trend positive">Of allocated space</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- All Water Section -->
+            <div id="all-water" class="content-section fade-in">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">All Water</h2>
+                        <p class="section-subtitle">Water quality monitoring and management</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Water Quality Score</h3>
+                            <div class="card-value">97.8%</div>
+                        </div>
+                        <div class="card-trend positive">Excellent rating</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Daily Consumption</h3>
+                            <div class="card-value">24,750 L</div>
+                        </div>
+                        <div class="card-trend positive">-12% vs yesterday</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>System Pressure</h3>
+                            <div class="card-value">4.2 bar</div>
+                        </div>
+                        <div class="card-trend positive">Optimal range</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Leakage Rate</h3>
+                            <div class="card-value">0.3%</div>
+                        </div>
+                        <div class="card-trend positive">Below threshold</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Section -->
+            <div id="team" class="content-section fade-in">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Team</h2>
+                        <p class="section-subtitle">Personnel management and HR</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Total Staff</h3>
+                            <div class="card-value">127</div>
+                        </div>
+                        <div class="card-trend positive">+3 new hires</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Attendance Rate</h3>
+                            <div class="card-value">96.2%</div>
+                        </div>
+                        <div class="card-trend positive">+1.4% this month</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Training Compliance</h3>
+                            <div class="card-value">89%</div>
+                        </div>
+                        <div class="card-trend pending">11% pending</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Overtime Hours</h3>
+                            <div class="card-value">247</div>
+                        </div>
+                        <div class="card-trend negative">+12% this week</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk Assessment Section -->
+            <div id="risk-assessment" class="content-section fade-in">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Risk Assessment</h2>
+                        <p class="section-subtitle">Safety and compliance management</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Overall Risk Score</h3>
+                            <div class="card-value">Low</div>
+                        </div>
+                        <div class="card-trend positive">2.3/10 risk level</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Open Risk Items</h3>
+                            <div class="card-value">7</div>
+                        </div>
+                        <div class="card-trend pending">Requires review</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Compliance Rate</h3>
+                            <div class="card-value">94%</div>
+                        </div>
+                        <div class="card-trend positive">Above target</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Last Audit</h3>
+                            <div class="card-value">15 days</div>
+                        </div>
+                        <div class="card-trend positive">Recent review</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="content-section fade-in">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Executive Dashboard</h2>
+                        <p class="section-subtitle">Comprehensive business overview</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Total Portfolio Value</h3>
+                            <div class="card-value">£847M</div>
+                        </div>
+                        <div class="card-trend positive">+3.2% this quarter</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Net Operating Income</h3>
+                            <div class="card-value">£24.7M</div>
+                        </div>
+                        <div class="card-trend positive">+5.8% YoY</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Occupancy Rate</h3>
+                            <div class="card-value">94.2%</div>
+                        </div>
+                        <div class="card-trend positive">Above target</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Customer Satisfaction</h3>
+                            <div class="card-value">87%</div>
+                        </div>
+                        <div class="card-trend positive">+2% this month</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Section -->
+            <div id="reports" class="content-section fade-in">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Reports</h2>
+                        <p class="section-subtitle">Comprehensive reporting and analysis</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Financial Reports</h3>
+                            <div class="card-value">12</div>
+                        </div>
+                        <div class="card-trend positive">Available templates</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Operational Reports</h3>
+                            <div class="card-value">8</div>
+                        </div>
+                        <div class="card-trend positive">Available templates</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Compliance Reports</h3>
+                            <div class="card-value">15</div>
+                        </div>
+                        <div class="card-trend positive">Available templates</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Custom Reports</h3>
+                            <div class="card-value">6</div>
+                        </div>
+                        <div class="card-trend positive">User created</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Custom Link Modal -->
+    <div id="addLinkModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Custom Link</h3>
+                <button class="close-btn" onclick="closeAddLinkModal()">×</button>
+            </div>
+            
+            <form id="addLinkForm">
+                <div class="form-group">
+                    <label class="form-label" for="linkName">Link Name *</label>
+                    <input type="text" id="linkName" class="form-input" required placeholder="e.g., External Booking System">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="linkUrl">URL *</label>
+                    <input type="url" id="linkUrl" class="form-input" required placeholder="https://example.com">
+                </div>
+                
+                <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddLinkModal()">Cancel</button>
+                    <button type="submit" class="btn">Add Link</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let customLinks = JSON.parse(localStorage.getItem('cqr365-custom-links') || '[]');
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCustomLinks();
+        });
+
+        // Mobile navigation functions
+        function toggleMobileNav() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.mobile-overlay');
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
+        }
+
+        function closeMobileNav() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.mobile-overlay');
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+        }
+
+        // Navigation functions
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Remove active class from all nav buttons
+            const navBtns = document.querySelectorAll('.nav-btn');
+            navBtns.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected section
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                targetSection.classList.add('fade-in');
+            }
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+
+            // Close mobile nav if open
+            if (window.innerWidth <= 768) {
+                closeMobileNav();
+            }
+        }
+
+        // Custom Links Management
+        function openAddLinkModal() {
+            document.getElementById('addLinkModal').classList.add('active');
+        }
+
+        function closeAddLinkModal() {
+            document.getElementById('addLinkModal').classList.remove('active');
+            document.getElementById('addLinkForm').reset();
+        }
+
+        function addCustomLink(name, url) {
+            const newLink = {
+                id: Date.now().toString(),
+                name: name,
+                url: url
+            };
+            
+            customLinks.push(newLink);
+            localStorage.setItem('cqr365-custom-links', JSON.stringify(customLinks));
+            renderCustomLinks();
+        }
+
+        function removeCustomLink(id) {
+            if (confirm('Are you sure you want to remove this custom link?')) {
+                customLinks = customLinks.filter(link => link.id !== id);
+                localStorage.setItem('cqr365-custom-links', JSON.stringify(customLinks));
+                renderCustomLinks();
+            }
+        }
+
+        function renderCustomLinks() {
+            const container = document.getElementById('customLinksContainer');
+            
+            if (customLinks.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = customLinks.map(link => `
+                <div style="position: relative; group;">
+                    <a href="${link.url}" target="_blank" class="custom-nav-btn">
+                        ${link.name}
+                        <span class="external-icon">↗</span>
+                    </a>
+                    <button 
+                        onclick="removeCustomLink('${link.id}')" 
+                        style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: rgba(220, 53, 69, 0.1); border: none; color: var(--danger); padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; opacity: 0; transition: opacity 0.3s ease;"
+                        onmouseover="this.style.opacity='1'"
+                        onmouseout="this.style.opacity='0'"
+                    >×</button>
+                </div>
+            `).join('');
+
+            // Add hover effect to show remove buttons
+            const linkContainers = container.querySelectorAll('div[style*="position: relative"]');
+            linkContainers.forEach(container => {
+                const removeBtn = container.querySelector('button');
+                container.addEventListener('mouseenter', () => {
+                    removeBtn.style.opacity = '1';
+                });
+                container.addEventListener('mouseleave', () => {
+                    removeBtn.style.opacity = '0';
+                });
+            });
+        }
+
+        // Handle add link form submission
+        document.getElementById('addLinkForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('linkName').value.trim();
+            const url = document.getElementById('linkUrl').value.trim();
+            
+            if (name && url) {
+                addCustomLink(name, url);
+                closeAddLinkModal();
+            }
+        });
+
+        // Close modals when clicking outside
+        document.getElementById('addLinkModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddLinkModal();
+            }
+        });
+
+        // Close modals with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAddLinkModal();
+            }
+        });
+
+        // Handle window resize for mobile nav
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeMobileNav();
+            }
+        });
+    </script>
+</body>
+</html>
