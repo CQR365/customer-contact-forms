@@ -1,38 +1,677 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CQR365 Incident Reporting System</title>
-    <!-- Keep your existing CSS styles here - they're excellent -->
-    <link href="style.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-color: #cc5500;
+            --primary-dark: #b84c00;
+            --secondary-color: #666666;
+            --success-color: #cc5500;
+            --warning-color: #cc5500;
+            --danger-color: #cc5500;
+            --background: #f5f5f5;
+            --surface: #ffffff;
+            --surface-elevated: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #666666;
+            --border-light: #e0e0e0;
+            --border-color: #cccccc;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.2);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.2);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.2);
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        .header {
+            text-align: center;
+            background: var(--surface);
+            color: var(--text-primary);
+            padding: 40px 32px;
+            border-radius: var(--radius-xl);
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-light);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color), var(--warning-color));
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .incident-ref {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 16px;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .form-container {
+            background: var(--surface-elevated);
+            padding: 48px;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            margin-bottom: 24px;
+            border: 1px solid var(--border-light);
+            backdrop-filter: blur(10px);
+        }
+        
+        .step {
+            display: none;
+        }
+        
+        .step.active {
+            display: block;
+            animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(24px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+        
+        .step-header {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-light);
+            position: relative;
+        }
+        
+        .step-header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: var(--primary-color);
+        }
+        
+        .step-header h2 {
+            color: var(--text-primary);
+            font-size: 2rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .step-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        .progress-bar {
+            background: var(--border-light);
+            height: 6px;
+            border-radius: 3px;
+            margin-bottom: 40px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            position: relative;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .form-group {
+            margin-bottom: 28px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+        
+        .required {
+            color: var(--danger-color);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 16px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--surface);
+            font-family: inherit;
+            font-weight: 500;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgb(37 99 235 / 0.1);
+            transform: translateY(-1px);
+        }
+        
+        input:hover, select:hover, textarea:hover {
+            border-color: var(--text-secondary);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+        
+        .severity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .severity-card {
+            background: var(--surface);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .severity-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--border-light);
+            transition: all 0.3s ease;
+        }
+        
+        .severity-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .severity-card.selected {
+            border-color: var(--primary-color);
+            background: rgb(37 99 235 / 0.05);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+        
+        .severity-card.selected::before {
+            background: var(--primary-color);
+        }
+        
+        .severity-card input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .severity-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        
+        .severity-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            font-weight: 500;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 2px solid var(--border-light);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text-secondary);
+            border: 2px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--border-light);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+        
+        .btn-investigation {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            margin-left: auto;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-investigation:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+        
+        .checkbox-item:hover {
+            background: var(--border-light);
+            border-color: var(--border-color);
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            accent-color: var(--primary-color);
+        }
+        
+        .file-upload {
+            border: 2px dashed var(--primary-color);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            text-align: center;
+            background: rgb(37 99 235 / 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        
+        .file-upload:hover {
+            border-color: var(--primary-dark);
+            background: rgb(37 99 235 / 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .file-upload input[type="file"] {
+            display: none;
+        }
+        
+        .file-upload-text {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .file-upload-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .summary-card {
+            background: var(--border-light);
+            padding: 28px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 28px;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 500;
+        }
+        
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+        
+        .alert {
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 28px;
+            border-left: 4px solid;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .alert-success {
+            background: rgb(16 185 129 / 0.1);
+            border-color: var(--success-color);
+            color: #065f46;
+        }
+        
+        .witness-status-container {
+            background: var(--border-light);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-top: 12px;
+        }
+        
+        .witness-status-message {
+            color: var(--text-secondary);
+            font-style: italic;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .witness-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .witness-item {
+            background: rgb(37 99 235 / 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        
+        .witness-item:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .witness-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .witness-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .witness-name {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .witness-details {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .witness-status {
+            background: var(--success-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-indicator.active {
+            background: rgb(16 185 129 / 0.1);
+            color: var(--success-color);
+        }
+        
+        .status-indicator::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
+            .form-container {
+                padding: 32px 24px;
+            }
+            
+            .header {
+                padding: 32px 24px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .severity-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .checkbox-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn {
+                justify-content: center;
+                width: 100%;
+            }
+        }
+        
+        .btn.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        .btn.loading::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 8px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <!-- Your existing HTML structure with these key modifications: -->
-    
-    <!-- Wrap everything in a single form for Formspree submission -->
-    <form id="masterIncidentForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" enctype="multipart/form-data">
-        
-        <!-- Hidden fields to track form state -->
-        <input type="hidden" name="_subject" value="New Incident Report">
-        <input type="hidden" name="incident_reference" id="hiddenIncidentRef">
-        <input type="hidden" name="form_sections_completed" id="hiddenSectionsCompleted">
-        <input type="hidden" name="witness_statements_json" id="hiddenWitnessData">
-        
-        <!-- Your existing container and header -->
-        <div class="container">
-            <div class="header">
-                <h1>CQR365 Incident Reporting System</h1>
-                <p>Professional incident management and reporting platform</p>
-                <div class="incident-ref" id="incidentRef">
-                    <span>Incident Reference: <span id="refNumber">INC-20250830-1633-4524</span></span>
-                </div>
-                <div class="status-indicator active">
-                    <span>System Active</span>
-                </div>
+    <div class="container">
+        <div class="header">
+            <h1>CQR365 Incident Reporting System</h1>
+            <p>Professional incident management and reporting platform</p>
+            <div class="incident-ref" id="incidentRef">
+                <span>Incident Reference: <span id="refNumber">INC-20250830-1633-4524</span></span>
             </div>
-            
-            <!-- Main Incident Form Section -->
+            <div class="status-indicator active">
+                <span>System Active</span>
+            </div>
+        </div>
+        
+        <!-- Form with Formspree integration -->
+        <form id="masterIncidentForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" enctype="multipart/form-data" style="display: contents;">
+            <!-- Hidden fields for Formspree -->
+            <input type="hidden" name="_subject" value="New CQR365 Incident Report">
+            <input type="hidden" name="incident_reference" id="hiddenIncidentRef">
+            <input type="hidden" name="witness_statements_json" id="hiddenWitnessData">
+            <input type="hidden" name="form_sections_completed" id="hiddenSectionsCompleted">
+        
+            <!-- Initial Incident Form -->
             <div class="form-container" id="incidentForm">
                 <div class="progress-bar">
                     <div class="progress-fill"></div>
@@ -44,7 +683,6 @@
                         <p>Provide comprehensive details about the incident for proper documentation and follow-up</p>
                     </div>
                     
-                    <!-- Add name attributes for Formspree -->
                     <div class="form-row">
                         <div class="form-group">
                             <label for="incidentDate">Date of Incident <span class="required">*</span></label>
@@ -67,23 +705,59 @@
                                 <option value="">Select your role...</option>
                                 <option value="manager">Manager</option>
                                 <option value="supervisor">Supervisor</option>
-                                <!-- Keep all your existing options -->
+                                <option value="team-lead">Team Lead</option>
+                                <option value="employee">Employee</option>
+                                <option value="contractor">Contractor</option>
+                                <option value="visitor">Visitor</option>
+                                <option value="guest">Guest</option>
+                                <option value="customer">Customer</option>
+                                <option value="other">Other</option>
                             </select>
                         </div>
                     </div>
                     
-                    <!-- Continue adding name attributes to all form fields -->
                     <div class="form-group">
                         <label for="incidentLocation">Location of Incident <span class="required">*</span></label>
                         <select id="incidentLocation" name="incident_location" required>
-                            <!-- Your existing options -->
+                            <option value="">Select incident location...</option>
+                            <option value="reception">Reception Area</option>
+                            <option value="restaurant">Restaurant</option>
+                            <option value="bar">Bar/Lounge</option>
+                            <option value="kitchen">Kitchen</option>
+                            <option value="accommodation">Accommodation Unit</option>
+                            <option value="swimming-pool">Swimming Pool Area</option>
+                            <option value="playground">Playground</option>
+                            <option value="car-park">Car Park</option>
+                            <option value="maintenance">Maintenance Area</option>
+                            <option value="toilet-facilities">Toilet Facilities</option>
+                            <option value="outdoor-areas">Outdoor Areas</option>
+                            <option value="entrance">Entrance/Exit</option>
+                            <option value="stairways">Stairways</option>
+                            <option value="corridors">Corridors</option>
+                            <option value="laundry">Laundry Facilities</option>
+                            <option value="other">Other Location</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label for="incidentType">Type of Incident <span class="required">*</span></label>
                         <select id="incidentType" name="incident_type" required>
-                            <!-- Your existing options -->
+                            <option value="">Select incident type...</option>
+                            <option value="accident">Accident</option>
+                            <option value="near-miss">Near Miss</option>
+                            <option value="injury">Personal Injury</option>
+                            <option value="property-damage">Property Damage</option>
+                            <option value="security">Security Incident</option>
+                            <option value="fire">Fire Related</option>
+                            <option value="medical">Medical Emergency</option>
+                            <option value="environmental">Environmental</option>
+                            <option value="equipment-failure">Equipment Failure</option>
+                            <option value="customer-complaint">Customer Complaint</option>
+                            <option value="theft">Theft/Loss</option>
+                            <option value="violence">Violence/Aggression</option>
+                            <option value="food-safety">Food Safety</option>
+                            <option value="health-safety">Health & Safety</option>
+                            <option value="other">Other</option>
                         </select>
                     </div>
                     
@@ -95,23 +769,111 @@
                                 <div class="severity-title">Low</div>
                                 <div class="severity-desc">Minor incident, no injury, minimal business impact</div>
                             </div>
-                            <!-- Keep your existing severity options -->
+                            <div class="severity-card">
+                                <input type="radio" name="incident_severity" value="medium" id="severity-medium" required>
+                                <div class="severity-title">Medium</div>
+                                <div class="severity-desc">Moderate incident, first aid required, some business impact</div>
+                            </div>
+                            <div class="severity-card">
+                                <input type="radio" name="incident_severity" value="high" id="severity-high" required>
+                                <div class="severity-title">High</div>
+                                <div class="severity-desc">Serious incident, medical attention required, significant impact</div>
+                            </div>
+                            <div class="severity-card">
+                                <input type="radio" name="incident_severity" value="critical" id="severity-critical" required>
+                                <div class="severity-title">Critical</div>
+                                <div class="severity-desc">Major incident, emergency services required, severe impact</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="peopleInvolved">People Involved</label>
+                        <div class="checkbox-grid">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="employees" name="people_involved" value="employees">
+                                <label for="employees">Employees</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="guests" name="people_involved" value="guests">
+                                <label for="guests">Guests</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="contractors" name="people_involved" value="contractors">
+                                <label for="contractors">Contractors</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="visitors" name="people_involved" value="visitors">
+                                <label for="visitors">Visitors</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="management" name="people_involved" value="management">
+                                <label for="management">Management</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="emergency-services" name="people_involved" value="emergency-services">
+                                <label for="emergency-services">Emergency Services</label>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label for="incidentDescription">Detailed Description <span class="required">*</span></label>
-                        <textarea id="incidentDescription" name="incident_description" rows="4" placeholder="Provide a comprehensive description..." required></textarea>
+                        <textarea id="incidentDescription" name="incident_description" rows="4" placeholder="Provide a comprehensive description of what happened, including sequence of events, conditions, and any factors that may have contributed to the incident..." required></textarea>
                     </div>
                     
-                    <!-- File upload for Formspree -->
+                    <div class="form-group">
+                        <label for="immediateActions">Immediate Actions Taken</label>
+                        <textarea id="immediateActions" name="immediate_actions" rows="3" placeholder="Describe any immediate actions taken following the incident (medical assistance, scene safety, notifications, etc.)..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="witnesses">Witnesses</label>
+                        <textarea id="witnesses" name="witnesses_info" rows="2" placeholder="Names, contact details, and roles of any witnesses present during the incident..."></textarea>
+                    </div>
+                    
                     <div class="form-group">
                         <label>Evidence & Documentation</label>
-                        <input type="file" name="evidence_files" id="fileUpload" multiple accept="image/*,.pdf,.doc,.docx">
-                        <div class="file-upload-desc">Photos, documents, reports (Max 10MB per file)</div>
+                        <div class="file-upload" onclick="document.getElementById('fileUpload').click()">
+                            <input type="file" id="fileUpload" name="evidence_files" multiple accept="image/*,.pdf,.doc,.docx">
+                            <div class="file-upload-text">Click to upload evidence files</div>
+                            <div class="file-upload-desc">Photos, documents, reports, or other relevant evidence (Max 10MB per file)</div>
+                        </div>
                     </div>
                     
-                    <!-- Navigation buttons -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="notifiedAuthorities">Authorities Notified</label>
+                            <select id="notifiedAuthorities" name="authorities_notified">
+                                <option value="">Select if applicable...</option>
+                                <option value="none">None Required</option>
+                                <option value="police">Police</option>
+                                <option value="fire-service">Fire Service</option>
+                                <option value="ambulance">Ambulance Service</option>
+                                <option value="health-safety-executive">Health & Safety Executive</option>
+                                <option value="environmental-agency">Environmental Agency</option>
+                                <option value="local-authority">Local Authority</option>
+                                <option value="insurance">Insurance Company</option>
+                                <option value="multiple">Multiple Authorities</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="followUpRequired">Follow-up Required</label>
+                            <select id="followUpRequired" name="followup_required">
+                                <option value="no">No</option>
+                                <option value="yes">Yes</option>
+                                <option value="unknown">To Be Determined</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Witness Statements Status</label>
+                        <div id="witnessStatus" class="witness-status-container">
+                            <div class="witness-status-message">No witness statements completed yet</div>
+                        </div>
+                    </div>
+                    
                     <div class="navigation">
                         <button type="button" class="btn btn-primary" onclick="proceedToInvestigation()">
                             Continue to Investigation
@@ -123,121 +885,301 @@
                 </div>
             </div>
             
-            <!-- Investigation Form Section (hidden initially) -->
+            <!-- Investigation Form -->
             <div class="form-container" id="investigationForm" style="display: none;">
-                <!-- Add name attributes to all investigation fields -->
-                <div class="form-group">
-                    <label for="investigator">Lead Investigator <span class="required">*</span></label>
-                    <input type="text" id="investigator" name="lead_investigator" placeholder="Name and title of investigating officer">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="rootCause">Root Cause Analysis <span class="required">*</span></label>
-                    <textarea id="rootCause" name="root_cause_analysis" rows="4" placeholder="Identify and analyze the underlying root cause(s)..."></textarea>
-                </div>
-                
-                <!-- Continue with all investigation fields... -->
-                
-                <div class="navigation">
-                    <button type="button" class="btn btn-secondary" onclick="backToIncidentForm()">
-                        Back to Incident Report
-                    </button>
-                    <button type="button" class="btn btn-primary" onclick="proceedToSubmission()">
-                        Review & Submit
-                    </button>
+                <div class="step active">
+                    <div class="step-header">
+                        <h2>Investigation & Action Plan</h2>
+                        <p>Comprehensive analysis and corrective measures to prevent recurrence</p>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="investigator">Lead Investigator <span class="required">*</span></label>
+                            <input type="text" id="investigator" name="lead_investigator" placeholder="Name and title of investigating officer">
+                        </div>
+                        <div class="form-group">
+                            <label for="investigationDate">Investigation Date <span class="required">*</span></label>
+                            <input type="date" id="investigationDate" name="investigation_date">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="rootCause">Root Cause Analysis <span class="required">*</span></label>
+                        <textarea id="rootCause" name="root_cause_analysis" rows="4" placeholder="Identify and analyze the underlying root cause(s) that led to this incident. Consider human factors, system failures, environmental conditions, and organizational issues..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contributingFactors">Contributing Factors</label>
+                        <div class="checkbox-grid">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="human-error" name="contributing_factors" value="human-error">
+                                <label for="human-error">Human Error</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="equipment-failure" name="contributing_factors" value="equipment-failure">
+                                <label for="equipment-failure">Equipment Failure</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="inadequate-training" name="contributing_factors" value="inadequate-training">
+                                <label for="inadequate-training">Inadequate Training</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="poor-procedures" name="contributing_factors" value="poor-procedures">
+                                <label for="poor-procedures">Poor Procedures</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="environmental" name="contributing_factors" value="environmental">
+                                <label for="environmental">Environmental Factors</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="communication" name="contributing_factors" value="communication">
+                                <label for="communication">Communication Issues</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="supervision" name="contributing_factors" value="supervision">
+                                <label for="supervision">Lack of Supervision</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="maintenance" name="contributing_factors" value="maintenance">
+                                <label for="maintenance">Poor Maintenance</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="correctiveActions">Corrective Actions <span class="required">*</span></label>
+                        <textarea id="correctiveActions" name="corrective_actions" rows="4" placeholder="List specific, measurable actions to address the root cause and prevent recurrence of this type of incident..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="preventiveActions">Preventive Actions</label>
+                        <textarea id="preventiveActions" name="preventive_actions" rows="3" placeholder="Additional proactive measures to strengthen overall safety and risk management systems..."></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="actionOwner">Action Owner <span class="required">*</span></label>
+                            <input type="text" id="actionOwner" name="action_owner" placeholder="Person/department responsible for implementing actions">
+                        </div>
+                        <div class="form-group">
+                            <label for="targetDate">Target Completion Date <span class="required">*</span></label>
+                            <input type="date" id="targetDate" name="target_completion_date">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="priority">Priority Level <span class="required">*</span></label>
+                            <select id="priority" name="priority_level">
+                                <option value="">Select priority level...</option>
+                                <option value="low">Low Priority</option>
+                                <option value="medium">Medium Priority</option>
+                                <option value="high">High Priority</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="resourcesRequired">Resources Required</label>
+                            <select id="resourcesRequired" name="resources_required">
+                                <option value="">Select resources needed...</option>
+                                <option value="training">Additional Training</option>
+                                <option value="equipment">New Equipment</option>
+                                <option value="procedures">Updated Procedures</option>
+                                <option value="signage">Additional Signage</option>
+                                <option value="maintenance">Maintenance Work</option>
+                                <option value="staffing">Additional Staffing</option>
+                                <option value="budget">Budget Allocation</option>
+                                <option value="external-support">External Support</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="monitoringPlan">Monitoring & Review Plan</label>
+                        <textarea id="monitoringPlan" name="monitoring_plan" rows="3" placeholder="Describe how the effectiveness of implemented actions will be monitored, measured, and reviewed over time..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lessonsLearned">Lessons Learned</label>
+                        <textarea id="lessonsLearned" name="lessons_learned" rows="3" placeholder="Key insights and lessons that can be shared across the organization to prevent similar incidents elsewhere..."></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reviewDate">Review Date</label>
+                            <input type="date" id="reviewDate" name="review_date">
+                        </div>
+                        <div class="form-group">
+                            <label for="investigationStatus">Investigation Status</label>
+                            <select id="investigationStatus" name="investigation_status">
+                                <option value="open">Open</option>
+                                <option value="in-progress">In Progress</option>
+                                <option value="pending-review">Pending Review</option>
+                                <option value="completed">Completed</option>
+                                <option value="closed">Closed</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button type="button" class="btn btn-secondary" onclick="backToIncidentForm()">
+                            Back to Incident Report
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="proceedToSubmission()">
+                            Review & Submit
+                        </button>
+                    </div>
                 </div>
             </div>
             
-            <!-- Final Submission Section -->
+            <!-- Final Submission Review -->
             <div class="form-container" id="submissionForm" style="display: none;">
-                <div class="step-header">
-                    <h2>Review & Submit</h2>
-                    <p>Review your incident report before final submission</p>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
                 </div>
                 
-                <!-- Summary of all collected data -->
-                <div id="reportSummary"></div>
+                <div class="step active">
+                    <div class="step-header">
+                        <h2>Review & Submit Report</h2>
+                        <p>Review your complete incident report before final submission</p>
+                    </div>
+                    
+                    <div id="reportSummary"></div>
+                    
+                    <div class="navigation">
+                        <button type="button" class="btn btn-secondary" onclick="backToInvestigation()">
+                            Back to Edit
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="finalSubmitBtn">
+                            Submit Complete Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Witness Form -->
+            <div class="form-container" id="witnessForm" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
                 
-                <div class="navigation">
-                    <button type="button" class="btn btn-secondary" onclick="backToInvestigation()">
-                        Back to Edit
-                    </button>
-                    <button type="submit" class="btn btn-primary" id="finalSubmitBtn">
-                        Submit Complete Report
-                    </button>
+                <div class="step active">
+                    <div class="step-header">
+                        <h2>Witness Statement</h2>
+                        <p id="witnessFormSubtitle">Detailed witness account for incident documentation</p>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="witnessName">Full Name <span class="required">*</span></label>
+                            <input type="text" id="witnessName" placeholder="Complete legal name">
+                        </div>
+                        <div class="form-group">
+                            <label for="witnessPhone">Phone Number <span class="required">*</span></label>
+                            <input type="tel" id="witnessPhone" placeholder="Primary contact number">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="witnessEmail">Email Address</label>
+                            <input type="email" id="witnessEmail" placeholder="Email contact (optional)">
+                        </div>
+                        <div class="form-group">
+                            <label for="witnessAddress">Address</label>
+                            <input type="text" id="witnessAddress" placeholder="Home address (optional)">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="witnessRelation">Relationship to Incident <span class="required">*</span></label>
+                            <select id="witnessRelation">
+                                <option value="">Select your relationship...</option>
+                                <option value="employee">Employee</option>
+                                <option value="guest">Guest</option>
+                                <option value="customer">Customer</option>
+                                <option value="visitor">Visitor</option>
+                                <option value="contractor">Contractor</option>
+                                <option value="bystander">Bystander</option>
+                                <option value="family-member">Family Member</option>
+                                <option value="friend">Friend</option>
+                                <option value="emergency-responder">Emergency Responder</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="witnessRole">Role/Position (if applicable)</label>
+                            <input type="text" id="witnessRole" placeholder="Job title or official position">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="whatWitnessed">What did you witness? <span class="required">*</span></label>
+                        <textarea id="whatWitnessed" rows="4" placeholder="Provide a detailed, chronological account of exactly what you saw, heard, or experienced..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="beforeIncident">What was happening before the incident?</label>
+                        <textarea id="beforeIncident" rows="3" placeholder="Describe the situation, activities, and conditions leading up to the incident..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="afterIncident">What happened immediately after?</label>
+                        <textarea id="afterIncident" rows="3" placeholder="Describe the immediate aftermath, responses, and any consequences you observed..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="additionalInfo">Additional information</label>
+                        <textarea id="additionalInfo" rows="3" placeholder="Any other relevant details, observations, or information that may be important for the investigation..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 12px;">
+                            <input type="checkbox" id="statementAccuracy" style="width: 20px; height: 20px; margin: 0;">
+                            <span>I confirm that this statement is true and accurate to the best of my knowledge and belief <span class="required">*</span></span>
+                        </label>
+                    </div>
+                    
+                    <div class="navigation">
+                        <button type="button" class="btn btn-secondary" onclick="backToIncidentForm()">
+                            Back to Main Report
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="submitWitnessForm()">
+                            Submit Statement
+                        </button>
+                        <button type="button" class="btn btn-investigation" onclick="addNewWitness()">
+                            Add Another Witness
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Success Message -->
+        <div id="successMessage" style="display: none;">
+            <div class="alert alert-success">
+                <h3>Submission Successful</h3>
+                <p id="successDetails">Your incident report has been successfully submitted and processed.</p>
+                <div style="margin-top: 16px; padding: 16px; background: rgba(255,255,255,0.5); border-radius: 8px;">
+                    <strong>Reference Number: <span id="successRefNumber"></span></strong>
                 </div>
             </div>
         </div>
-    </form>
+    </div>
     
     <script>
-        // Modified JavaScript for Formspree integration
+        // Global variables
         let witnesses = [];
+        let currentWitnessIndex = 0;
         let incidentReferenceNumber = '';
         
-        // Initialize form
-        document.addEventListener('DOMContentLoaded', function() {
-            incidentReferenceNumber = generateIncidentReference();
-            document.getElementById('refNumber').textContent = incidentReferenceNumber;
-            document.getElementById('hiddenIncidentRef').value = incidentReferenceNumber;
-            
-            // Set current date/time
-            const now = new Date();
-            document.getElementById('incidentDate').value = now.toISOString().split('T')[0];
-            document.getElementById('incidentTime').value = now.toTimeString().slice(0, 5);
-        });
-        
-        // Form submission handler
-        document.getElementById('masterIncidentForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Prepare data for submission
-            prepareFormData();
-            
-            // Submit to Formspree
-            submitToFormspree();
-        });
-        
-        function prepareFormData() {
-            // Update hidden fields with current state
-            document.getElementById('hiddenSectionsCompleted').value = getCurrentSections();
-            document.getElementById('hiddenWitnessData').value = JSON.stringify(witnesses);
-        }
-        
-        function submitToFormspree() {
-            const form = document.getElementById('masterIncidentForm');
-            const formData = new FormData(form);
-            
-            // Show loading state
-            document.getElementById('finalSubmitBtn').classList.add('loading');
-            
-            fetch(form.action, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (response.ok) {
-                    showSuccessMessage();
-                } else {
-                    throw new Error('Submission failed');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('There was an error submitting your report. Please try again.');
-            })
-            .finally(() => {
-                document.getElementById('finalSubmitBtn').classList.remove('loading');
-            });
-        }
-        
-        function showSuccessMessage() {
-            // Hide forms and show success
-            document.getElementById('submissionForm').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'block';
-        }
-        
-        // Your existing helper functions
+        // Generate incident reference number
         function generateIncidentReference() {
             const now = new Date();
             const year = now.getFullYear();
@@ -250,7 +1192,79 @@
             return `INC-${year}${month}${day}-${hours}${minutes}-${random}`;
         }
         
-        // Navigation functions
+        // Initialize the form
+        document.addEventListener('DOMContentLoaded', function() {
+            // Generate and display incident reference number
+            incidentReferenceNumber = generateIncidentReference();
+            document.getElementById('refNumber').textContent = incidentReferenceNumber;
+            document.getElementById('hiddenIncidentRef').value = incidentReferenceNumber;
+            
+            // Set current date and time as defaults
+            const now = new Date();
+            document.getElementById('incidentDate').value = now.toISOString().split('T')[0];
+            document.getElementById('incidentTime').value = now.toTimeString().slice(0, 5);
+            document.getElementById('investigationDate').value = now.toISOString().split('T')[0];
+            
+            // Add event listeners for severity cards
+            const severityCards = document.querySelectorAll('.severity-card');
+            severityCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    severityCards.forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    this.querySelector('input[type="radio"]').checked = true;
+                });
+            });
+            
+            // File upload handler
+            document.getElementById('fileUpload').addEventListener('change', function(e) {
+                const fileList = Array.from(e.target.files);
+                if (fileList.length > 0) {
+                    const fileUploadText = document.querySelector('.file-upload-text');
+                    fileUploadText.innerHTML = `${fileList.length} file(s) selected`;
+                    
+                    const fileUploadDesc = document.querySelector('.file-upload-desc');
+                    const fileNames = fileList.slice(0, 3).map(f => f.name).join(', ');
+                    const extra = fileList.length > 3 ? ` and ${fileList.length - 3} more` : '';
+                    fileUploadDesc.textContent = `${fileNames}${extra}`;
+                }
+            });
+            
+            // Form submission handler
+            document.getElementById('masterIncidentForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitToFormspree();
+            });
+        });
+        
+        function validateIncidentForm() {
+            const requiredFields = ['incidentDate', 'incidentTime', 'reportedBy', 'reporterRole', 'incidentLocation', 'incidentType', 'incidentDescription'];
+            const severitySelected = document.querySelector('input[name="incident_severity"]:checked');
+            
+            let isValid = true;
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    field.style.borderColor = 'var(--danger-color)';
+                    field.style.boxShadow = '0 0 0 4px rgba(239, 68, 68, 0.1)';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = 'var(--border-color)';
+                    field.style.boxShadow = 'none';
+                }
+            });
+            
+            if (!severitySelected) {
+                alert('Please select an incident severity level to continue.');
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                alert('Please complete all required fields marked with * before proceeding.');
+            }
+            
+            return isValid;
+        }
+        
         function proceedToInvestigation() {
             if (validateIncidentForm()) {
                 document.getElementById('incidentForm').style.display = 'none';
@@ -260,15 +1274,257 @@
         }
         
         function proceedToSubmission() {
-            if (validateInvestigationForm()) {
-                generateReportSummary();
-                document.getElementById('investigationForm').style.display = 'none';
-                document.getElementById('submissionForm').style.display = 'block';
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+            generateReportSummary();
+            document.getElementById('investigationForm').style.display = 'none';
+            document.getElementById('submissionForm').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function backToIncidentForm() {
+            document.getElementById('investigationForm').style.display = 'none';
+            document.getElementById('witnessForm').style.display = 'none';
+            document.getElementById('submissionForm').style.display = 'none';
+            document.getElementById('incidentForm').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function backToInvestigation() {
+            document.getElementById('submissionForm').style.display = 'none';
+            document.getElementById('investigationForm').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function openWitnessForm() {
+            clearWitnessForm();
+            currentWitnessIndex = witnesses.length;
+            updateWitnessFormTitle();
+            
+            document.getElementById('incidentForm').style.display = 'none';
+            document.getElementById('investigationForm').style.display = 'none';
+            document.getElementById('witnessForm').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function clearWitnessForm() {
+            const textInputs = document.querySelectorAll('#witnessForm input[type="text"], #witnessForm input[type="tel"], #witnessForm input[type="email"], #witnessForm textarea');
+            textInputs.forEach(input => input.value = '');
+            
+            const selects = document.querySelectorAll('#witnessForm select');
+            selects.forEach(select => select.selectedIndex = 0);
+            
+            document.getElementById('statementAccuracy').checked = false;
+        }
+        
+        function updateWitnessFormTitle() {
+            const subtitle = document.getElementById('witnessFormSubtitle');
+            subtitle.textContent = `Witness Statement #${currentWitnessIndex + 1} - Reference: ${incidentReferenceNumber}`;
+        }
+        
+        function submitWitnessForm() {
+            const requiredFields = ['witnessName', 'witnessPhone', 'witnessRelation', 'whatWitnessed'];
+            const accuracyCheckbox = document.getElementById('statementAccuracy');
+            
+            let isValid = true;
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    field.style.borderColor = 'var(--danger-color)';
+                    field.style.boxShadow = '0 0 0 4px rgba(239, 68, 68, 0.1)';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = 'var(--border-color)';
+                    field.style.boxShadow = 'none';
+                }
+            });
+            
+            if (!accuracyCheckbox.checked) {
+                alert('Please confirm that your statement is accurate before submitting.');
+                isValid = false;
+            }
+            
+            if (isValid) {
+                const witnessData = {
+                    name: document.getElementById('witnessName').value,
+                    phone: document.getElementById('witnessPhone').value,
+                    email: document.getElementById('witnessEmail').value,
+                    address: document.getElementById('witnessAddress').value,
+                    relation: document.getElementById('witnessRelation').value,
+                    role: document.getElementById('witnessRole').value,
+                    whatWitnessed: document.getElementById('whatWitnessed').value,
+                    beforeIncident: document.getElementById('beforeIncident').value,
+                    afterIncident: document.getElementById('afterIncident').value,
+                    additionalInfo: document.getElementById('additionalInfo').value,
+                    submittedAt: new Date().toISOString(),
+                    referenceNumber: incidentReferenceNumber
+                };
+                
+                if (currentWitnessIndex < witnesses.length) {
+                    witnesses[currentWitnessIndex] = witnessData;
+                } else {
+                    witnesses.push(witnessData);
+                }
+                
+                updateWitnessStatus();
+                backToIncidentForm();
+                
+                alert(`Witness statement #${currentWitnessIndex + 1} submitted successfully!\n\nReference: ${incidentReferenceNumber}`);
+            } else {
+                alert('Please complete all required fields marked with * before submitting.');
             }
         }
         
-        // Add your existing validation and helper functions...
+        function addNewWitness() {
+            const nameField = document.getElementById('witnessName');
+            if (nameField.value.trim()) {
+                submitWitnessForm();
+                return;
+            }
+            
+            clearWitnessForm();
+            currentWitnessIndex = witnesses.length;
+            updateWitnessFormTitle();
+        }
+        
+        function updateWitnessStatus() {
+            const statusContainer = document.getElementById('witnessStatus');
+            
+            if (witnesses.length === 0) {
+                statusContainer.innerHTML = '<div class="witness-status-message">No witness statements completed yet</div>';
+            } else {
+                const witnessListHTML = witnesses.map((witness, index) => `
+                    <div class="witness-item">
+                        <div class="witness-info">
+                            <div class="witness-name">${witness.name}</div>
+                            <div class="witness-details">${witness.relation} • ${witness.phone}</div>
+                        </div>
+                        <div class="witness-status">Completed</div>
+                    </div>
+                `).join('');
+                
+                statusContainer.innerHTML = `
+                    <div style="margin-bottom: 16px; font-weight: 700; color: var(--success-color); display: flex; align-items: center; gap: 8px;">
+                        <span>✅</span>
+                        <span>${witnesses.length} witness statement(s) completed</span>
+                    </div>
+                    <div class="witness-list">${witnessListHTML}</div>
+                `;
+            }
+        }
+        
+        function generateReportSummary() {
+            const summaryContainer = document.getElementById('reportSummary');
+            const incidentData = {
+                date: document.getElementById('incidentDate').value,
+                time: document.getElementById('incidentTime').value,
+                reportedBy: document.getElementById('reportedBy').value,
+                reporterRole: document.getElementById('reporterRole').value,
+                location: document.getElementById('incidentLocation').value,
+                type: document.getElementById('incidentType').value,
+                severity: document.querySelector('input[name="incident_severity"]:checked')?.value || '',
+                description: document.getElementById('incidentDescription').value
+            };
+            
+            const investigator = document.getElementById('investigator').value;
+            
+            summaryContainer.innerHTML = `
+                <div class="summary-card">
+                    <h3>Incident Summary</h3>
+                    <div class="summary-row">
+                        <span><strong>Reference:</strong></span>
+                        <span>${incidentReferenceNumber}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span><strong>Date/Time:</strong></span>
+                        <span>${incidentData.date} at ${incidentData.time}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span><strong>Location:</strong></span>
+                        <span>${incidentData.location}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span><strong>Severity:</strong></span>
+                        <span>${incidentData.severity.toUpperCase()}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span><strong>Reported By:</strong></span>
+                        <span>${incidentData.reportedBy} (${incidentData.reporterRole})</span>
+                    </div>
+                    <div class="summary-row">
+                        <span><strong>Witness Statements:</strong></span>
+                        <span>${witnesses.length} completed</span>
+                    </div>
+                    <div class="summary-row">
+                        <span><strong>Investigation Status:</strong></span>
+                        <span>${investigator ? 'Completed' : 'Pending'}</span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function submitToFormspree() {
+            // Update hidden fields with current state
+            document.getElementById('hiddenWitnessData').value = JSON.stringify(witnesses);
+            
+            const sectionsCompleted = [];
+            if (validateIncidentForm()) sectionsCompleted.push('incident');
+            if (document.getElementById('investigator').value) sectionsCompleted.push('investigation');
+            if (witnesses.length > 0) sectionsCompleted.push('witnesses');
+            
+            document.getElementById('hiddenSectionsCompleted').value = sectionsCompleted.join(',');
+            
+            const form = document.getElementById('masterIncidentForm');
+            const submitBtn = document.getElementById('finalSubmitBtn');
+            
+            // Show loading state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            
+            // Submit to Formspree
+            fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form)
+            })
+            .then(response => {
+                if (response.ok) {
+                    showSuccessMessage();
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            })
+            .catch(error => {
+                console.error('Submission error:', error);
+                alert('There was an error submitting your report. Please try again or contact support.');
+            })
+            .finally(() => {
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+            });
+        }
+        
+        function showSuccessMessage() {
+            document.getElementById('submissionForm').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+            
+            const severityLevel = document.querySelector('input[name="incident_severity"]:checked')?.value?.toUpperCase() || 'UNKNOWN';
+            const witnessCount = witnesses.length;
+            const successDetails = document.getElementById('successDetails');
+            
+            successDetails.innerHTML = `
+                Your <strong>${severityLevel}</strong> severity incident report has been successfully submitted with <strong>${witnessCount} witness statement(s)</strong>. 
+                The relevant team members and stakeholders have been automatically notified. 
+                ${severityLevel === 'HIGH' || severityLevel === 'CRITICAL' ? 
+                    '<br><br>⚡ <strong>High Priority:</strong> This incident requires immediate management attention and has been escalated accordingly.' : 
+                    '<br><br>📋 Your report is now in the system and will be processed according to standard procedures.'
+                }
+            `;
+            
+            document.getElementById('successRefNumber').textContent = incidentReferenceNumber;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            setTimeout(() => {
+                alert(`Report submitted successfully!\n\nReference: ${incidentReferenceNumber}\n\nYou will receive email confirmation shortly.`);
+            }, 500);
+        }
     </script>
 </body>
 </html>
