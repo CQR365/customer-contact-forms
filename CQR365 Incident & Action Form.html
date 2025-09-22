@@ -1462,56 +1462,64 @@
         }
         
         function submitToFormspree() {
-            // Update hidden fields with current state
-            document.getElementById('hiddenWitnessData').value = JSON.stringify(witnesses);
-            
-            const sectionsCompleted = [];
-            if (validateIncidentForm()) sectionsCompleted.push('incident');
-            if (document.getElementById('investigator').value) sectionsCompleted.push('investigation');
-            if (witnesses.length > 0) sectionsCompleted.push('witnesses');
-            
-            document.getElementById('hiddenSectionsCompleted').value = sectionsCompleted.join(',');
-            
-            const form = document.getElementById('masterIncidentForm');
-            const submitBtn = document.getElementById('finalSubmitBtn');
-            
-            // Show loading state
-            submitBtn.classList.add('loading');
-            submitBtn.disabled = true;
-            
-            // Create FormData and remove file input if no files selected (for free plan compatibility)
-            const formData = new FormData(form);
-            const fileInput = document.getElementById('fileUpload');
-            if (fileInput && fileInput.files.length === 0) {
-                formData.delete('evidence_files');
-            }
-            
-            // Submit to Formspree with better error handling
-            fetch(form.action, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                console.log('Response status:', response.status);
-                console.log('Response headers:', response.headers);
-                return response.text().then(text => {
-                    console.log('Response text:', text);
-                    if (response.ok) {
-                        showSuccessMessage();
-                    } else {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}. Response: ${text}`);
-                    }
-                });
-            })
-            .catch(error => {
-                console.error('Detailed submission error:', error);
-                alert(`Submission failed: ${error.message}\n\nPlease check:\n1. Your Formspree form ID is correct\n2. Your form is active in Formspree dashboard\n3. You have confirmed your email with Formspree\n4. File uploads require paid plan`);
-            })
-            .finally(() => {
-                submitBtn.classList.remove('loading');
-                submitBtn.disabled = false;
-            });
+    const form = document.getElementById('masterIncidentForm');
+    const submitBtn = document.getElementById('finalSubmitBtn');
+    
+    // Show loading state
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+    
+    // Create simplified form data
+    const formData = new FormData();
+    
+    // Add basic incident data
+    formData.append('incident_reference', incidentReferenceNumber);
+    formData.append('incident_date', document.getElementById('incidentDate').value);
+    formData.append('incident_time', document.getElementById('incidentTime').value);
+    formData.append('reported_by', document.getElementById('reportedBy').value);
+    formData.append('reporter_role', document.getElementById('reporterRole').value);
+    formData.append('incident_location', document.getElementById('incidentLocation').value);
+    formData.append('incident_type', document.getElementById('incidentType').value);
+    formData.append('incident_description', document.getElementById('incidentDescription').value);
+    
+    // Add severity
+    const severity = document.querySelector('input[name="incident_severity"]:checked');
+    if (severity) {
+        formData.append('incident_severity', severity.value);
+    }
+    
+    // Add witness count (not full data)
+    formData.append('witness_statements_count', witnesses.length);
+    
+    // Add investigation data if present
+    const investigator = document.getElementById('investigator').value;
+    if (investigator) {
+        formData.append('lead_investigator', investigator);
+        formData.append('root_cause_analysis', document.getElementById('rootCause').value);
+        formData.append('corrective_actions', document.getElementById('correctiveActions').value);
+    }
+    
+    // Submit to Formspree
+    fetch('https://formspree.io/f/YOUR_FORM_ID', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            showSuccessMessage();
+        } else {
+            throw new Error(`HTTP ${response.status}`);
         }
+    })
+    .catch(error => {
+        console.error('Submission error:', error);
+        alert(`Submission failed: ${error.message}`);
+    })
+    .finally(() => {
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+    });
+}
         
         function showSuccessMessage() {
             document.getElementById('submissionForm').style.display = 'none';
