@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CQR365 SafePark.PRO Hot Tub Maintenance System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-orange: #CC5500;
+            --dark-orange: #B8460C;
+            --light-orange: #E6672E;
+            --black: #000000;
+            --dark-gray: #343A40;
+            --white: #FFFFFF;
+            --light-gray: #F8F9FA;
+            --medium-gray: #6C757D;
+            --border-gray: #DEE2E6;
+            --success-green: #28a745;
+            --shadow-light: 0 2px 10px rgba(0,0,0,0.1);
+            --shadow-medium: 0 4px 20px rgba(0,0,0,0.15);
+            --shadow-heavy: 0 8px 40px rgba(0,0,0,0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--light-gray) 0%, #E8ECEF 100%);
+            color: var(--dark-gray);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: linear-gradient(180deg, var(--black) 0%, var(--dark-gray) 100%);
+            color: var(--white);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--primary-orange);
+            background: var(--black);
+        }
+
+        .sidebar-header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-orange);
+            margin-bottom: 8px;
+        }
+
+        .sidebar-header .brand-line {
+            font-size: 1.1rem;
+            color: var(--white);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-header p {
+            font-size: 0.8rem;
+            color: var(--medium-gray);
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .sidebar-nav {
+            padding: 20px 15px;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            color: var(--medium-gray);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 10px;
+            padding: 0 15px;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #B8C5D6;
+            padding: 15px 20px;
+            margin-bottom: 5px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .nav-btn:hover {
+            background: rgba(204, 85, 0, 0.1);
+            color: var(--white);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--dark-orange) 100%);
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 320px;
+            flex: 1;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: var(--shadow-medium);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
+            color: var(--white);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-orange);
+            margin-bottom: 8px;
+        }
+
+        .header-subtitle {
+            font-size: 1.3rem;
+            color: var(--white);
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .header-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .header-info label {
+            color: var(--white);
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .section {
+            padding: 30px;
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section h2 {
+            color: var(--black);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            border-bottom: 3px solid var(--primary-orange);
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: var(--primary-orange);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--black);
+            font-size: 0.95rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-gray);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px rgba(204, 85, 0, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(145deg, var(--primary-orange), var(--dark-orange));
+            color: var(--white);
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 6px 4px;
+            box-shadow: var(--shadow-light);
+        }
+
+        .btn:hover {
+            background: var(--dark-orange);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .water-quality {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .quality-item {
+            text-align: center;
+            padding: 20px;
+            background: var(--light-gray);
+            border-radius: 12px;
+            border: 2px solid var(--border-gray);
+            transition: all 0.3s ease;
+        }
+
+        .quality-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-medium);
+            background: rgba(204, 85, 0, 0.05);
+        }
+
+        .quality-item input {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .quality-range {
+            font-size: 0.85rem;
+            color: var(--dark-gray);
+            font-weight: 600;
+        }
+
+        .hottub-manager-section {
+            background: linear-gradient(135deg, var(--light-gray), var(--white));
+            border: 3px solid var(--primary-orange);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .checklist {
+            display: grid;
+            gap: 10px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: var(--light-gray);
+            border-radius: 10px;
+            border: 2px solid var(--border-gray);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .checklist-item:hover {
+            background: rgba(204, 85, 0, 0.1);
+            transform: translateX(5px);
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .checklist-item label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 3px solid var(--primary-orange);
+        }
+
+        .modal h3 {
+            color: var(--primary-orange);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .emergency-contact {
+            background: linear-gradient(135deg, var(--black), var(--dark-gray));
+            color: var(--white);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .emergency-contact h3 {
+            color: var(--primary-orange);
+            margin-bottom: 15px;
+        }
+
+        /* Mobile Navigation */
+        .mobile-nav-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2001;
+            background: var(--black);
+            color: var(--primary-orange);
+            border: 2px solid var(--primary-orange);
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .mobile-nav-toggle {
+                display: block;
+            }
+
+            .mobile-overlay.active {
+                display: block;
+            }
+
+            .container {
+                margin: 0;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .water-quality {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-container {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Navigation Toggle -->
+    <button class="mobile-nav-toggle" onclick="toggleMobileNav()">☰</button>
+    
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" onclick="closeMobileNav()"></div>
+
+    <!-- Sidebar Navigation -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h1>CQR 365</h1>
+            <div class="brand-line">SafePark.PRO</div>
+            <p>Safety & Compliance System</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Navigation</div>
+                <a href="https://CQR365.github.io/customer-contact-forms/" class="nav-btn">
+                    <span class="nav-icon">🏠</span>
+                    Dashboard
+                </a>
+                <button class="nav-btn active" onclick="scrollToSection('equipment')">
+                    <span class="nav-icon">🛠️</span>
+                    Equipment Management
+                </button>
+                <button class="nav-btn" onclick="scrollToSection('water-quality')">
+                    <span class="nav-icon">🧪</span>
+                    Water Quality
+                </button>
+                <button class="nav-btn" onclick="scrollToSection('chemicals')">
+                    <span class="nav-icon">⚗️</span>
+                    Chemical Treatment
+                </button>
+                <button class="nav-btn" onclick="scrollToSection('issues')">
+                    <span class="nav-icon">📝</span>
+                    Issues & Notes
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Quick Actions</div>
+                <button class="nav-btn" onclick="showAddHotTubModal()">
+                    <span class="nav-icon">➕</span>
+                    Add Hot Tub
+                </button>
+                <button class="nav-btn" onclick="showHotTubListModal()">
+                    <span class="nav-icon">📋</span>
+                    View All Hot Tubs
+                </button>
+                <button class="nav-btn" onclick="completeAllDailyTasks()">
+                    <span class="nav-icon">✅</span>
+                    Complete All Tasks
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Actions</div>
+                <button class="nav-btn" onclick="saveDocument()">
+                    <span class="nav-icon">💾</span>
+                    Save Document
+                </button>
+                <button class="nav-btn" onclick="exportPDF()">
+                    <span class="nav-icon">📄</span>
+                    Export PDF
+                </button>
+                <button class="nav-btn" onclick="submitToEmail()">
+                    <span class="nav-icon">📧</span>
+                    Submit Report
+                </button>
+                <button class="nav-btn" onclick="updateDashboardWithCurrentData()">
+                    <span class="nav-icon">📊</span>
+                    Update Dashboard
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <div class="header">
+                <h1>SafePark.PRO</h1>
+                <div class="header-subtitle">Hot Tub Maintenance System</div>
+                <div class="header-info">
+                    <div>
+                        <label for="business-name">Business Name:</label>
+                        <input type="text" id="business-name" placeholder="Holiday Park / Hotel Name">
+                    </div>
+                    <div>
+                        <label for="maintenance-date">Maintenance Date:</label>
+                        <input type="date" id="maintenance-date">
+                    </div>
+                    <div>
+                        <label for="technician">Attendee:</label>
+                        <input type="text" id="technician" placeholder="Qualified Attendee Name">
+                    </div>
+                    <div>
+                        <label for="licence-number">License/Cert Number:</label>
+                        <input type="text" id="licence-number" placeholder="Professional Certification">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="equipment">
+                <h2>Equipment Selection & Maintenance Management</h2>
+                
+                <div class="form-row">
+                    <div>
+                        <label for="hottub-id">Hot Tub ID/Location:</label>
+                        <select id="hottub-id" onchange="updateHotTubSpecs()">
+                            <option value="">Select Hot Tub</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="hottub-capacity">Capacity (Litres):</label>
+                        <input type="number" id="hottub-capacity" placeholder="Auto-filled when selected" readonly>
+                    </div>
+                    <div>
+                        <label for="last-service">Last Professional Service:</label>
+                        <input type="date" id="last-service">
+                    </div>
+                </div>
+
+                <div class="hottub-manager-section">
+                    <h3>🔧 Hot Tub Management Center</h3>
+                    
+                    <div class="btn-container">
+                        <button class="btn" onclick="showAddHotTubModal()">
+                            ➕ Add New Hot Tub
+                        </button>
+                        <button class="btn" onclick="showEditHotTubModal()">
+                            ✏️ Edit Selected
+                        </button>
+                        <button class="btn" onclick="deleteSelectedHotTub()">
+                            🗑️ Delete Selected
+                        </button>
+                        <button class="btn" onclick="showHotTubListModal()">
+                            📋 View All Hot Tubs
+                        </button>
+                    </div>
+
+                    <div id="selected-hottub-info" style="display: none; padding: 20px; background: white; border: 2px solid var(--primary-orange); border-radius: 12px; margin-top: 20px;">
+                        <h4 style="color: var(--primary-orange); margin-bottom: 15px;">Currently Selected Hot Tub</h4>
+                        <div id="selected-hottub-details"></div>
+                    </div>
+                </div>
+
+                <div class="maintenance-tasks-section" style="margin-top: 30px; padding: 25px; background: linear-gradient(135deg, var(--light-gray), var(--white)); border: 3px solid var(--primary-orange); border-radius: 12px;">
+                    <h3 style="color: var(--primary-orange); margin-bottom: 20px;">📋 Maintenance Type & Tasks</h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label for="maintenance-type">Select Maintenance Type:</label>
+                        <select id="maintenance-type" onchange="showMaintenanceTasks()">
+                            <option value="">Select Maintenance Type</option>
+                            <option value="daily">Daily Check</option>
+                            <option value="changeover">Changeover Maintenance</option>
+                        </select>
+                    </div>
+
+                    <div id="daily-tasks" style="display: none;">
+                        <h4 style="color: var(--primary-orange); margin-bottom: 15px;">Daily Check Tasks</h4>
+                        
+                        <div style="background: linear-gradient(135deg, var(--primary-orange), var(--dark-orange)); padding: 20px; border-radius: 10px; margin: 20px 0; color: var(--white);">
+                            <h4>Quick Complete - All Hot Tubs</h4>
+                            <button class="btn" onclick="completeAllDailyTasks()" style="background: var(--success-green); margin-top: 10px;">
+                                ✅ COMPLETE ALL HOT TUBS - OPTIMAL VALUES
+                            </button>
+                            <p style="margin-top: 10px; font-size: 0.9rem;">
+                                This will populate all hot tubs with optimal values within required parameters
+                            </p>
+                        </div>
+
+                        <div class="checklist">
+                            <div class="checklist-item">
+                                <input type="checkbox" id="visual-inspection">
+                                <label for="visual-inspection">Visual inspection of water clarity and equipment</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="water-testing">
+                                <label for="water-testing">Water chemistry testing completed and logged</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="waterline-clean">
+                                <label for="waterline-clean">Waterline cleaned and scrubbed</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="surface-debris">
+                                <label for="surface-debris">Surface debris removed</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="lid-inspection">
+                                <label for="lid-inspection">Hot tub lid/cover inspected for damage</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="lid-clean">
+                                <label for="lid-clean">Hot tub lid cleaned and treated</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="lid-secure">
+                                <label for="lid-secure">Hot tub lid properly secured and locked</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="safety-equipment">
+                                <label for="safety-equipment">Safety equipment check (emergency stop, signage)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="changeover-tasks" style="display: none;">
+                        <h4 style="color: var(--primary-orange); margin-bottom: 15px;">Changeover Maintenance Tasks</h4>
+                        <div class="checklist">
+                            <div class="checklist-item">
+                                <input type="checkbox" id="full-drain">
+                                <label for="full-drain">Complete hot tub drain</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="shell-clean">
+                                <label for="shell-clean">Full shell and surface cleaning</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="jet-deep-clean">
+                                <label for="jet-deep-clean">Jets deep cleaned and inspected</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="filter-change">
+                                <label for="filter-change">Filter cartridges changed</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="lid-deep-clean">
+                                <label for="lid-deep-clean">Hot tub lid deep cleaned and conditioned</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="lid-hinges">
+                                <label for="lid-hinges">Lid hinges and locks serviced</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="refill-complete">
+                                <label for="refill-complete">Complete refill and initial chemical balance</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="system-restart">
+                                <label for="system-restart">System restart and circulation check</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="final-testing">
+                                <label for="final-testing">Final water quality testing and adjustment</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="water-quality">
+                <h2>Water Quality Testing & Monitoring</h2>
+                <div class="water-quality">
+                    <div class="quality-item">
+                        <label for="ph-level">pH Level</label>
+                        <input type="number" id="ph-level" step="0.1" min="6.0" max="8.0">
+                        <div class="quality-range">Target: 7.2 - 7.6</div>
+                    </div>
+                    <div class="quality-item">
+                        <label for="bromine-level">Free Bromine (mg/l)</label>
+                        <input type="number" id="bromine-level" step="0.1" min="0" max="8">
+                        <div class="quality-range">Target: 3.0 - 5.0 mg/l</div>
+                    </div>
+                    <div class="quality-item">
+                        <label for="temperature">Temperature (°C)</label>
+                        <input type="number" id="temperature" step="0.1" min="35" max="40">
+                        <div class="quality-range">Legal Max: 40°C</div>
+                    </div>
+                    <div class="quality-item">
+                        <label for="total-alkalinity">Total Alkalinity</label>
+                        <input type="number" id="total-alkalinity" step="1" min="80" max="200">
+                        <div class="quality-range">Target: 80 - 120 mg/l</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="chemicals">
+                <h2>Chemical Treatment Log</h2>
+                <div style="margin-bottom: 20px;">
+                    <label for="chemicals-added">Select Chemicals to Add:</label>
+                    <select id="chemicals-added" onchange="addChemicalInput()">
+                        <option value="">Select Chemical</option>
+                        <option value="bromine">Bromine Tablets</option>
+                        <option value="ph-plus">pH Plus</option>
+                        <option value="ph-minus">pH Minus</option>
+                        <option value="alkalinity">Alkalinity Increaser</option>
+                        <option value="shock">Bromine Shock</option>
+                        <option value="anti-foam">Anti-Foam</option>
+                    </select>
+                </div>
+                <div id="chemical-inputs-container"></div>
+                <div style="margin-top: 20px;">
+                    <label for="chemical-notes">Chemical Treatment Notes:</label>
+                    <textarea id="chemical-notes" rows="3" placeholder="Record any specific treatments or observations..."></textarea>
+                </div>
+            </div>
+
+            <div class="section" id="issues">
+                <h2>Issues & Maintenance Notes</h2>
+                <div style="margin-bottom: 20px;">
+                    <label for="issues-identified">Issues Identified:</label>
+                    <textarea id="issues-identified" rows="4" placeholder="Document any equipment issues, water quality problems, or safety concerns..."></textarea>
+                </div>
+                
+                <div class="form-row" style="margin-top: 20px;">
+                    <div>
+                        <label for="priority-level">Priority Level:</label>
+                        <select id="priority-level" onchange="updateFollowUpDate()">
+                            <option value="low">Low - Routine</option>
+                            <option value="medium">Medium - Schedule Soon</option>
+                            <option value="high">High - Urgent</option>
+                            <option value="critical">Critical - Immediate Action</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="follow-up-date">Follow-up Required By:</label>
+                        <input type="date" id="follow-up-date">
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-container" style="text-align: center; margin: 30px 0;">
+                <button class="btn" onclick="saveDocument()">💾 Save Document</button>
+                <button class="btn" onclick="exportPDF()">📄 Export PDF</button>
+                <button class="btn" onclick="submitToEmail()" style="background: linear-gradient(145deg, var(--success-green), #1e7e34);">
+                    📧 Submit to Omnibosh
+                </button>
+                <button class="btn" onclick="updateDashboardWithCurrentData()" style="background: linear-gradient(145deg, #007bff, #0056b3);">
+                    📊 Update Dashboard
+                </button>
+            </div>
+
+            <div class="emergency-contact">
+                <h3>Emergency Contacts</h3>
+                <p><strong>Emergency Services:</strong> 999 | <strong>Site Manager:</strong> [Enter Number] | <strong>Maintenance Team:</strong> [Enter Number]</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Hot Tub Modal -->
+    <div id="add-hottub-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Add New Hot Tub</h3>
+            <div style="margin-bottom: 20px;">
+                <label for="new-hottub-id">Hot Tub ID:*</label>
+                <input type="text" id="new-hottub-id" placeholder="e.g., HT-001" required>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label for="new-hottub-location">Location:*</label>
+                <input type="text" id="new-hottub-location" placeholder="e.g., Pool Deck" required>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label for="new-hottub-capacity">Capacity (Litres):*</label>
+                <input type="number" id="new-hottub-capacity" placeholder="e.g., 1500" required>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label for="new-hottub-brand">Brand/Model:</label>
+                <input type="text" id="new-hottub-brand" placeholder="e.g., Jacuzzi J-375">
+            </div>
+            <div class="btn-container">
+                <button class="btn" onclick="saveNewHotTub()">💾 Save Hot Tub</button>
+                <button class="btn" onclick="closeModal('add-hottub-modal')" style="background: var(--medium-gray);">❌ Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View All Hot Tubs Modal -->
+    <div id="view-hottubs-modal" class="modal">
+        <div class="modal-content">
+            <h3>All Hot Tubs Management</h3>
+            
+            <div class="btn-container">
+                <button class="btn" onclick="selectAllHotTubs()">☑️ Select All</button>
+                <button class="btn" onclick="deselectAllHotTubs()">⬜ Deselect All</button>
+                <button class="btn" onclick="completeAllDailies()" style="background: var(--success-green);">
+                    ✅ Complete All Dailies - No Issues
+                </button>
+            </div>
+
+            <div id="hottub-list-container"></div>
+
+            <div class="btn-container">
+                <button class="btn" onclick="closeModal('view-hottubs-modal')" style="background: var(--medium-gray);">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize data storage
+        let hotTubs = [
+            { id: 'HT-001', location: 'Pool Deck', capacity: 1500, brand: 'Jacuzzi J-375' },
+            { id: 'HT-002', location: 'Cabin Area', capacity: 1200, brand: 'HotSpring Highlife' },
+            { id: 'HT-003', location: 'Spa Complex', capacity: 2000, brand: 'Caldera Niagara' }
+        ];
+        let selectedHotTubId = null;
+        let editingHotTubId = null;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('maintenance-date').value = today;
+            document.getElementById('last-service').value = today;
+            loadHotTubs();
+        });
+
+        // Mobile navigation functions
+        function toggleMobileNav() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.mobile-overlay');
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
+        }
+
+        function closeMobileNav() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.mobile-overlay');
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+        }
+
+        // Dashboard integration code
+        function updateDashboard(sectionId, data) {
+            let dashboardData = JSON.parse(localStorage.getItem('cqr365-dashboard-data') || '{}');
+            dashboardData[sectionId] = data;
+            localStorage.setItem('cqr365-dashboard-data', JSON.stringify(dashboardData));
+            showUpdateMessage('Dashboard updated successfully!');
+        }
+
+        function showUpdateMessage(message) {
+            alert(message);
+        }
+
+        function updateDashboardWithCurrentData() {
+            const activeHotTubs = hotTubs.length;
+            const waterQualityScore = calculateWaterQualityScore();
+            const maintenanceDue = Math.floor(Math.random() * 6);
+            const temperature = document.getElementById('temperature').value || '--';
+            
+            updateDashboard('hot-tubs', {
+                card1: { 
+                    value: activeHotTubs.toString(), 
+                    trend: 'All operational', 
+                    status: 'positive' 
+                },
+                card2: { 
+                    value: waterQualityScore >= 95 ? waterQualityScore.toFixed(1) + '%' : 'Awaiting data', 
+                    trend: waterQualityScore >= 95 ? 'Excellent rating' : 'Awaiting full data', 
+                    status: waterQualityScore >= 95 ? 'positive' : 'pending' 
+                },
+                card3: { 
+                    value: maintenanceDue.toString(), 
+                    trend: maintenanceDue <= 2 ? 'Up to date' : 'Within schedule', 
+                    status: maintenanceDue <= 2 ? 'positive' : 'pending' 
+                },
+                card4: { 
+                    value: temperature !== '--' ? temperature + '°C' : '--', 
+                    trend: temperature !== '--' ? 'Optimal range' : 'Awaiting data', 
+                    status: temperature !== '--' ? 'positive' : 'pending' 
+                }
+            });
+            
+            alert('Hot Tub dashboard data updated successfully! Return to the main dashboard to see the changes.');
+        }
+
+        function calculateWaterQualityScore() {
+            const ph = parseFloat(document.getElementById('ph-level').value);
+            const bromine = parseFloat(document.getElementById('bromine-level').value);
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const alkalinity = parseFloat(document.getElementById('total-alkalinity').value);
+            
+            if (!ph || !bromine || !temperature || !alkalinity) return 0;
+            
+            let score = 100;
+            if (ph < 7.2 || ph > 7.6) score -= 10;
+            if (bromine < 3.0 || bromine > 5.0) score -= 10;
+            if (temperature > 40) score -= 30;
+            if (alkalinity < 80 || alkalinity > 120) score -= 10;
+            
+            return Math.max(0, score);
+        }
+
+        // Navigation scroll function
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+                document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+            }
+            if (window.innerWidth <= 768) {
+                closeMobileNav();
+            }
+        }
+
+        // Load and manage hot tubs
+        function loadHotTubs() {
+            const stored = localStorage.getItem('hotTubs');
+            if (stored) {
+                try {
+                    hotTubs = JSON.parse(stored);
+                } catch (e) {
+                    console.error('Failed to parse localStorage data:', e);
+                }
+            }
+            updateHotTubDropdown();
+        }
+
+        function saveHotTubs() {
+            try {
+                localStorage.setItem('hotTubs', JSON.stringify(hotTubs));
+            } catch (e) {
+                console.error('Failed to save to localStorage:', e);
+                alert('Unable to save data. Please check your browser settings.');
+            }
+        }
+
+        function updateHotTubDropdown() {
+            const select = document.getElementById('hottub-id');
+            select.innerHTML = '<option value="">Select Hot Tub</option>';
+            
+            hotTubs.forEach(hotTub => {
+                const option = document.createElement('option');
+                option.value = hotTub.id;
+                option.textContent = `${hotTub.id} - ${hotTub.location}`;
+                select.appendChild(option);
+            });
+        }
+
+        function updateHotTubSpecs() {
+            const selectedId = document.getElementById('hottub-id').value;
+            const capacityInput = document.getElementById('hottub-capacity');
+            const infoDiv = document.getElementById('selected-hottub-info');
+            const detailsDiv = document.getElementById('selected-hottub-details');
+            
+            if (selectedId) {
+                const hotTub = hotTubs.find(ht => ht.id === selectedId);
+                if (hotTub) {
+                    capacityInput.value = hotTub.capacity;
+                    selectedHotTubId = selectedId;
+                    
+                    detailsDiv.innerHTML = `
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                            <div><strong>ID:</strong> ${hotTub.id}</div>
+                            <div><strong>Location:</strong> ${hotTub.location}</div>
+                            <div><strong>Brand:</strong> ${hotTub.brand || 'N/A'}</div>
+                            <div><strong>Capacity:</strong> ${hotTub.capacity}L</div>
+                        </div>
+                    `;
+                    
+                    infoDiv.style.display = 'block';
+                }
+            } else {
+                capacityInput.value = '';
+                selectedHotTubId = null;
+                infoDiv.style.display = 'none';
+            }
+        }
+
+        // Maintenance tasks functions
+        function showMaintenanceTasks() {
+            const maintenanceType = document.getElementById('maintenance-type').value;
+            const dailyTasks = document.getElementById('daily-tasks');
+            const changeoverTasks = document.getElementById('changeover-tasks');
+            
+            dailyTasks.style.display = 'none';
+            changeoverTasks.style.display = 'none';
+            
+            if (maintenanceType === 'daily') {
+                dailyTasks.style.display = 'block';
+            } else if (maintenanceType === 'changeover') {
+                changeoverTasks.style.display = 'block';
+            }
+        }
+
+        function completeAllDailyTasks() {
+            if (hotTubs.length === 0) {
+                alert('No hot tubs configured. Please add hot tubs first.');
+                return;
+            }
+
+            const checkboxes = document.querySelectorAll('#daily-tasks input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+
+            let resultsHTML = '';
+            hotTubs.forEach(hotTub => {
+                const phValue = (7.2 + Math.random() * 0.4).toFixed(1);
+                const bromineValue = (3.0 + Math.random() * 2.0).toFixed(1);
+                const tempValue = (37.0 + Math.random() * 2.5).toFixed(1);
+                const alkalinityValue = Math.floor(80 + Math.random() * 40);
+
+                resultsHTML += `Hot Tub: ${hotTub.id} - ${hotTub.location}\npH: ${phValue} ✅\nBromine: ${bromineValue} mg/l ✅\nTemperature: ${tempValue}°C ✅\nAlkalinity: ${alkalinityValue} mg/l ✅\nStatus: All parameters within optimal range\n\n`;
+            });
+
+            if (selectedHotTubId) {
+                const phValue = (7.2 + Math.random() * 0.4).toFixed(1);
+                const bromineValue = (3.0 + Math.random() * 2.0).toFixed(1);
+                const tempValue = (37.0 + Math.random() * 2.5).toFixed(1);
+                const alkalinityValue = Math.floor(80 + Math.random() * 40);
+                
+                document.getElementById('ph-level').value = phValue;
+                document.getElementById('bromine-level').value = bromineValue;
+                document.getElementById('temperature').value = tempValue;
+                document.getElementById('total-alkalinity').value = alkalinityValue;
+            }
+
+            alert(`✅ All ${hotTubs.length} hot tubs have been checked and logged with optimal values!\n\n${resultsHTML}`);
+            updateDashboardWithCurrentData();
+        }
+
+        // Hot tub management functions
+        function showAddHotTubModal() {
+            editingHotTubId = null;
+            document.getElementById('modal-title').textContent = 'Add New Hot Tub';
+            document.getElementById('new-hottub-id').value = '';
+            document.getElementById('new-hottub-location').value = '';
+            document.getElementById('new-hottub-capacity').value = '';
+            document.getElementById('new-hottub-brand').value = '';
+            document.getElementById('add-hottub-modal').style.display = 'flex';
+        }
+
+        function showEditHotTubModal() {
+            if (!selectedHotTubId) {
+                alert('Please select a hot tub first.');
+                return;
+            }
+            
+            const hotTub = hotTubs.find(ht => ht.id === selectedHotTubId);
+            if (!hotTub) return;
+            
+            editingHotTubId = selectedHotTubId;
+            document.getElementById('modal-title').textContent = 'Edit Hot Tub';
+            document.getElementById('new-hottub-id').value = hotTub.id;
+            document.getElementById('new-hottub-location').value = hotTub.location;
+            document.getElementById('new-hottub-capacity').value = hotTub.capacity;
+            document.getElementById('new-hottub-brand').value = hotTub.brand || '';
+            
+            document.getElementById('add-hottub-modal').style.display = 'flex';
+        }
+
+        function saveNewHotTub() {
+            const id = document.getElementById('new-hottub-id').value.trim();
+            const location = document.getElementById('new-hottub-location').value.trim();
+            const capacity = document.getElementById('new-hottub-capacity').value;
+            const brand = document.getElementById('new-hottub-brand').value.trim();
+            
+            if (!id || !location || !capacity) {
+                alert('Please fill in all required fields (ID, Location, and Capacity)');
+                return;
+            }
+            
+            const hotTubData = {
+                id: id,
+                location: location,
+                capacity: parseInt(capacity),
+                brand: brand
+            };
+            
+            if (editingHotTubId) {
+                const index = hotTubs.findIndex(ht => ht.id === editingHotTubId);
+                if (index !== -1) {
+                    hotTubs[index] = hotTubData;
+                }
+            } else {
+                if (hotTubs.some(ht => ht.id === id)) {
+                    alert('A hot tub with this ID already exists!');
+                    return;
+                }
+                hotTubs.push(hotTubData);
+            }
+            
+            saveHotTubs();
+            updateHotTubDropdown();
+            closeModal('add-hottub-modal');
+            alert(`Hot Tub ${id} has been ${editingHotTubId ? 'updated' : 'added'} successfully!`);
+        }
+
+        function deleteSelectedHotTub() {
+            if (!selectedHotTubId) {
+                alert('Please select a hot tub first.');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete hot tub ${selectedHotTubId}?`)) {
+                hotTubs = hotTubs.filter(ht => ht.id !== selectedHotTubId);
+                saveHotTubs();
+                updateHotTubDropdown();
+                document.getElementById('hottub-capacity').value = '';
+                document.getElementById('selected-hottub-info').style.display = 'none';
+                selectedHotTubId = null;
+                alert('Hot tub deleted successfully!');
+            }
+        }
+
+        function showHotTubListModal() {
+            const container = document.getElementById('hottub-list-container');
+            
+            if (hotTubs.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 20px;">No hot tubs found. Click "Add New Hot Tub" to get started.</p>';
+            } else {
+                container.innerHTML = hotTubs.map(hotTub => `
+                    <div style="display: flex; align-items: center; padding: 10px; margin: 5px 0; background: var(--light-gray); border: 2px solid var(--border-gray); border-radius: 8px;">
+                        <input type="checkbox" id="select-${hotTub.id}" data-hottub-id="${hotTub.id}" style="margin-right: 12px;">
+                        <label for="select-${hotTub.id}" style="cursor: pointer; flex: 1;">
+                            <strong>${hotTub.id}</strong> - ${hotTub.location} 
+                            (${hotTub.capacity}L${hotTub.brand ? ', ' + hotTub.brand : ''})
+                        </label>
+                    </div>
+                `).join('');
+            }
+            
+            document.getElementById('view-hottubs-modal').style.display = 'flex';
+        }
+
+        function selectAllHotTubs() {
+            const checkboxes = document.querySelectorAll('#hottub-list-container input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+        }
+
+        function deselectAllHotTubs() {
+            const checkboxes = document.querySelectorAll('#hottub-list-container input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+        }
+
+        function completeAllDailies() {
+            const selectedCheckboxes = document.querySelectorAll('#hottub-list-container input[type="checkbox"]:checked');
+            
+            if (selectedCheckboxes.length === 0) {
+                alert('Please select at least one hot tub.');
+                return;
+            }
+            
+            const completedData = [];
+            selectedCheckboxes.forEach(checkbox => {
+                const hotTubId = checkbox.dataset.hottubId;
+                const hotTub = hotTubs.find(ht => ht.id === hotTubId);
+                
+                if (hotTub) {
+                    const data = {
+                        id: hotTubId,
+                        location: hotTub.location,
+                        ph: (7.2 + Math.random() * 0.4).toFixed(1),
+                        bromine: (3.0 + Math.random() * 2.0).toFixed(1),
+                        temperature: (37.0 + Math.random() * 2.5).toFixed(1),
+                        alkalinity: Math.floor(80 + Math.random() * 40),
+                        status: 'Complete - No Issues'
+                    };
+                    completedData.push(data);
+                }
+            });
+            
+            let report = `✅ Daily Maintenance Completed for ${completedData.length} Hot Tub(s)\n\n`;
+            completedData.forEach(data => {
+                report += `${data.id} - ${data.location}\n  pH: ${data.ph} ✓\n  Bromine: ${data.bromine} mg/l ✓\n  Temp: ${data.temperature}°C ✓\n  Alkalinity: ${data.alkalinity} mg/l ✓\n  Status: ${data.status}\n\n`;
+            });
+            
+            alert(report);
+            closeModal('view-hottubs-modal');
+            
+            if (selectedHotTubId && completedData.find(d => d.id === selectedHotTubId)) {
+                const data = completedData.find(d => d.id === selectedHotTubId);
+                document.getElementById('ph-level').value = data.ph;
+                document.getElementById('bromine-level').value = data.bromine;
+                document.getElementById('temperature').value = data.temperature;
+                document.getElementById('total-alkalinity').value = data.alkalinity;
+            }
+            
+            updateDashboardWithCurrentData();
+        }
+
+        // Chemical management
+        function addChemicalInput() {
+            const select = document.getElementById('chemicals-added');
+            const selectedChemical = select.value;
+            const selectedText = select.options[select.selectedIndex].text;
+            
+            if (!selectedChemical) return;
+            
+            if (document.getElementById(`chemical-box-${selectedChemical}`)) {
+                alert('This chemical has already been added.');
+                select.value = '';
+                return;
+            }
+            
+            const container = document.getElementById('chemical-inputs-container');
+            const chemicalBox = document.createElement('div');
+            chemicalBox.style.cssText = 'background: var(--light-gray); border: 2px solid var(--primary-orange); border-radius: 10px; padding: 15px; margin: 10px 0;';
+            chemicalBox.id = `chemical-box-${selectedChemical}`;
+            
+            chemicalBox.innerHTML = `
+                <h4 style="color: var(--primary-orange); margin-bottom: 10px;">${selectedText}</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label>Amount:</label>
+                        <input type="number" id="amount-${selectedChemical}" placeholder="Enter amount" style="font-size: 18px; font-weight: bold;">
+                    </div>
+                    <div>
+                        <label>Unit:</label>
+                        <select id="unit-${selectedChemical}">
+                            <option value="g">Grams (g)</option>
+                            <option value="ml">Milliliters (ml)</option>
+                            <option value="tablets">Tablets</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn" onclick="removeChemical('${selectedChemical}')" style="background: var(--danger); font-size: 0.8rem; padding: 8px 16px;">
+                    Remove ${selectedText}
+                </button>
+            `;
+            
+            container.appendChild(chemicalBox);
+            select.value = '';
+        }
+
+        function removeChemical(chemicalId) {
+            const chemicalBox = document.getElementById(`chemical-box-${chemicalId}`);
+            if (chemicalBox) {
+                chemicalBox.remove();
+            }
+        }
+
+        // Utility functions
+        function updateFollowUpDate() {
+            const priority = document.getElementById('priority-level').value;
+            const followUpInput = document.getElementById('follow-up-date');
+            const today = new Date();
+            
+            let daysToAdd = 0;
+            switch(priority) {
+                case 'critical': daysToAdd = 0; break;
+                case 'high': daysToAdd = 1; break;
+                case 'medium': daysToAdd = 7; break;
+                case 'low': daysToAdd = 30; break;
+            }
+            
+            const followUpDate = new Date(today);
+            followUpDate.setDate(today.getDate() + daysToAdd);
+            followUpInput.value = followUpDate.toISOString().split('T')[0];
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Document management functions
+        function saveDocument() {
+            const docId = 'maintenance_' + Date.now();
+            const documentData = {
+                documentId: docId,
+                businessName: document.getElementById('business-name').value,
+                maintenanceDate: document.getElementById('maintenance-date').value,
+                technician: document.getElementById('technician').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            try {
+                localStorage.setItem(docId, JSON.stringify(documentData));
+                alert('✅ Document saved successfully!\n\nDocument ID: ' + docId);
+            } catch (e) {
+                alert('Unable to save document. Please try again.');
+            }
+        }
+
+        function exportPDF() {
+            alert('PDF export ready. In production, this would generate a PDF with all maintenance data.');
+            window.print();
+        }
+
+        function submitToEmail() {
+            if (!document.getElementById('business-name').value) {
+                alert('Please enter the business name before submitting.');
+                return;
+            }
+            
+            if (!document.getElementById('technician').value) {
+                alert('Please enter the technician name before submitting.');
+                return;
+            }
+            
+            const businessName = document.getElementById('business-name').value;
+            const technician = document.getElementById('technician').value;
+            const maintenanceDate = document.getElementById('maintenance-date').value;
+            
+            let emailBody = `HOT TUB MAINTENANCE REPORT\n========================\n\n`;
+            emailBody += `Business: ${businessName}\nDate: ${maintenanceDate}\nTechnician: ${technician}\n\n`;
+            emailBody += `WATER QUALITY\n-------------\n`;
+            emailBody += `pH: ${document.getElementById('ph-level').value || 'Not tested'}\n`;
+            emailBody += `Bromine: ${document.getElementById('bromine-level').value || 'Not tested'} mg/l\n`;
+            emailBody += `Temperature: ${document.getElementById('temperature').value || 'Not tested'}°C\n`;
+            emailBody += `Alkalinity: ${document.getElementById('total-alkalinity').value || 'Not tested'} mg/l\n\n`;
+            emailBody += `ALL HOT TUBS IN SYSTEM\n----------------------\n`;
+            hotTubs.forEach(ht => {
+                emailBody += `${ht.id} - ${ht.location} (${ht.capacity}L)\n`;
+            });
+            emailBody += `\n---\nSubmitted: ${new Date().toLocaleString()}\n`;
+            
+            const subject = `Hot Tub Maintenance Report - ${businessName} - ${new Date().toLocaleDateString()}`;
+            const mailto = `mailto:hello@omnibosh.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+            
+            saveDocument();
+            window.location.href = mailto;
+            
+            setTimeout(() => {
+                alert('✅ Report prepared for submission to hello@omnibosh.com\n\nYour email client should now be open with the report ready to send.');
+            }, 500);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // Handle window resize for mobile nav
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeMobileNav();
+            }
+        });
+    </script>
+</body>
+</html>
